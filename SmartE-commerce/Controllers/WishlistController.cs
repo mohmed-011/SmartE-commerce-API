@@ -6,20 +6,20 @@ using System.Data;
 namespace SmartE_commerce.Controllers
 {
     [ApiController]
-    [Route("Cart")]
-    public class CartController : ControllerBase
-    {
+    [Route("Wishlist")]
 
+    public class WishlistController : ControllerBase
+    {
         private readonly ApplicationDbContext _dbContext;
         private readonly string _connectionString = "server=.;database=Smart_EcommerceV2;integrated security =true; trust server certificate = true ";
 
-        public CartController(ApplicationDbContext dbContext)
+        public WishlistController(ApplicationDbContext dbContext)
         {
             _dbContext = dbContext;
         }
 
-        [HttpPost("{BuyerId}/{ItemId}/{Quantity}")]
-        public async Task<IActionResult> AddItem(int BuyerId, int ItemId ,int Quantity)
+        [HttpPost("AddProduct/{BuyerId}/{ItemId}")]
+        public async Task<IActionResult> AddItem(int BuyerId, int ItemId)
         {
             try
             {
@@ -27,12 +27,12 @@ namespace SmartE_commerce.Controllers
                 {
                     await connection.OpenAsync();
 
-                    using (SqlCommand command = new SqlCommand("Sp_AddToCart", connection))
+                    using (SqlCommand command = new SqlCommand("Sp_AddToWishList", connection))
                     {
                         command.CommandType = CommandType.StoredProcedure;
                         command.Parameters.AddWithValue("@BuyerID", BuyerId);
                         command.Parameters.AddWithValue("@ItemID", ItemId);
-                        command.Parameters.AddWithValue("@Quantity", Quantity);
+                        
 
 
 
@@ -40,7 +40,7 @@ namespace SmartE_commerce.Controllers
                     }
                 }
 
-                return Ok("Item deleted successfully.");
+                return Ok("Item Added successfully to Wishlist.");
             }
             catch (Exception ex)
             {
@@ -49,8 +49,8 @@ namespace SmartE_commerce.Controllers
         }
 
 
-        [HttpPut("{BuyerId}/{ItemId}/{Quantity}")]
-        public async Task<IActionResult> UpdateItem(int BuyerId, int ItemId, int Quantity)
+        [HttpDelete("RemoveProduct/{BuyerId}/{ItemId}")]
+        public async Task<IActionResult> DeleteItem(int BuyerId, int ItemId)
         {
             try
             {
@@ -58,38 +58,7 @@ namespace SmartE_commerce.Controllers
                 {
                     await connection.OpenAsync();
 
-                    using (SqlCommand command = new SqlCommand("Sp_UpdateFromCart", connection))
-                    {
-                        command.CommandType = CommandType.StoredProcedure;
-                        command.Parameters.AddWithValue("@BuyerID", BuyerId);
-                        command.Parameters.AddWithValue("@ItemID", ItemId);
-                        command.Parameters.AddWithValue("@Quantity", Quantity);
-
-
-
-                        await command.ExecuteNonQueryAsync();
-                    }
-                }
-
-                return Ok("Item deleted successfully.");
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, $"Internal server error: {ex.Message}");
-            }
-        }
-        
-        
-        [HttpDelete("{BuyerId}/{ItemId}")]
-        public async Task<IActionResult> DeleteItem(int BuyerId, int ItemId )
-        {
-            try
-            {
-                using (SqlConnection connection = new SqlConnection(_connectionString))
-                {
-                    await connection.OpenAsync();
-
-                    using (SqlCommand command = new SqlCommand("Sp_deleteFromCart", connection))
+                    using (SqlCommand command = new SqlCommand("Sp_deleteFromWishList", connection))
                     {
                         command.CommandType = CommandType.StoredProcedure;
                         command.Parameters.AddWithValue("@BuyerID", BuyerId);
@@ -100,7 +69,7 @@ namespace SmartE_commerce.Controllers
                     }
                 }
 
-                return Ok("Item deleted successfully.");
+                return Ok("Item deleted successfully From Wishlist.");
             }
             catch (Exception ex)
             {
@@ -109,34 +78,7 @@ namespace SmartE_commerce.Controllers
         }
 
 
-        [HttpDelete("ClearCart/{BuyerId}")]
-        public async Task<IActionResult> EmptyCart(int BuyerId)
-        {
-            try
-            {
-                using (SqlConnection connection = new SqlConnection(_connectionString))
-                {
-                    await connection.OpenAsync();
-
-                    using (SqlCommand command = new SqlCommand("Sp_EmptyBuyerCart", connection))
-                    {
-                        command.CommandType = CommandType.StoredProcedure;
-                        command.Parameters.AddWithValue("@BuyerID", BuyerId);
-
-                        await command.ExecuteNonQueryAsync();
-                    }
-                }
-
-                return Ok("Item deleted successfully.");
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, $"Internal server error: {ex.Message}");
-            }
-        }
-
-
-        [HttpGet("GetUserItems/{UserId}")]
+        [HttpGet("GetUserProducts/{UserId}")]
         public async Task<IActionResult> GetUserItems(int UserId)
         {
             var resultList = new List<Dictionary<string, object>>();
@@ -147,7 +89,7 @@ namespace SmartE_commerce.Controllers
                 {
                     await connection.OpenAsync();
 
-                    using (SqlCommand command = new SqlCommand("Sp_GetFromCartById", connection))
+                    using (SqlCommand command = new SqlCommand("Sp_GetFromWishListById", connection))
                     {
                         command.CommandType = CommandType.StoredProcedure;
 

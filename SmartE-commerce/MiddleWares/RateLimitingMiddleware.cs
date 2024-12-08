@@ -23,7 +23,7 @@
             }
             else
             {
-                if (_counter > 5)
+                if (_counter > 20)
                 {
                     _lastRequestDate = DateTime.Now;
                     Context.Response.WriteAsync("Rate");
