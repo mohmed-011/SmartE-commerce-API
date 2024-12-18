@@ -19,7 +19,7 @@ namespace SmartE_commerce.Controllers
         }
 
         [HttpPost("AddProduct/{BuyerId}/{ItemId}")]
-        public async Task<IActionResult> AddItem(int BuyerId, int ItemId)
+        public async Task<IActionResult> AddItemToWishlist(int BuyerId, int ItemId)
         {
             try
             {
@@ -40,7 +40,7 @@ namespace SmartE_commerce.Controllers
                     }
                 }
 
-                return Ok("Item Added successfully to Wishlist.");
+                return Ok($"Item {ItemId} Added successfully to Wishlist.");
             }
             catch (Exception ex)
             {
@@ -69,7 +69,7 @@ namespace SmartE_commerce.Controllers
                     }
                 }
 
-                return Ok("Item deleted successfully From Wishlist.");
+                return Ok($"Item {ItemId} Deletet successfully to Wishlist.");
             }
             catch (Exception ex)
             {

@@ -40,7 +40,7 @@ namespace SmartE_commerce.Controllers
                     }
                 }
 
-                return Ok("Item deleted successfully.");
+                return Ok($"Item {ItemId} Added successfully to Cart.");
             }
             catch (Exception ex)
             {
@@ -71,7 +71,7 @@ namespace SmartE_commerce.Controllers
                     }
                 }
 
-                return Ok("Item deleted successfully.");
+                return Ok($"Item {ItemId} Updated successfully to Cart.");
             }
             catch (Exception ex)
             {
@@ -100,7 +100,7 @@ namespace SmartE_commerce.Controllers
                     }
                 }
 
-                return Ok("Item deleted successfully.");
+                return Ok($"Item {ItemId} deleted successfully.");
             }
             catch (Exception ex)
             {
@@ -127,7 +127,7 @@ namespace SmartE_commerce.Controllers
                     }
                 }
 
-                return Ok("Item deleted successfully.");
+                return Ok("Cart Empty now.");
             }
             catch (Exception ex)
             {

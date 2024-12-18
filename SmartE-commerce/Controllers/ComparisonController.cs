@@ -18,8 +18,9 @@ namespace SmartE_commerce.Controllers
             _dbContext = dbContext;
         }
 
-        [HttpGet("GetAllComparisons")]
-        public async Task<IActionResult> GetAllComparisons()
+
+        [HttpGet("GetPhonesComparison/{BuyerId}")]
+        public async Task<IActionResult> GetPhonesComparison(int BuyerId)
         {
             var resultList = new List<Dictionary<string, object>>();
 
@@ -29,9 +30,178 @@ namespace SmartE_commerce.Controllers
                 {
                     await connection.OpenAsync();
 
-                    using (SqlCommand command = new SqlCommand("Sp_GetAllComparison", connection))
+                    using (SqlCommand command = new SqlCommand("Sp_GetPhonesComparison", connection))
                     {
                         command.CommandType = CommandType.StoredProcedure;
+                        command.Parameters.AddWithValue("@Buyer_ID", BuyerId);
+
+                        // Pass parameters to the stored procedure
+
+                        using (SqlDataReader reader = await command.ExecuteReaderAsync())
+                        {
+                            while (await reader.ReadAsync())
+                            {
+                                var row = new Dictionary<string, object>();
+
+                                for (int i = 0; i < reader.FieldCount; i++)
+                                {
+                                    row[reader.GetName(i)] = reader.GetValue(i);
+                                }
+
+                                resultList.Add(row);
+                            }
+                        }
+                    }
+                }
+
+                return Ok(resultList);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
+        }
+        [HttpGet("GetLaptopsComparison/{BuyerId}")]
+        public async Task<IActionResult> GetLaptopsComparison(int BuyerId)
+        {
+            var resultList = new List<Dictionary<string, object>>();
+
+            try
+            {
+                using (SqlConnection connection = new SqlConnection(_connectionString))
+                {
+                    await connection.OpenAsync();
+
+                    using (SqlCommand command = new SqlCommand("Sp_GetLaptopsComparison", connection))
+                    {
+                        command.CommandType = CommandType.StoredProcedure;
+                        command.Parameters.AddWithValue("@Buyer_ID", BuyerId);
+
+                        // Pass parameters to the stored procedure
+
+                        using (SqlDataReader reader = await command.ExecuteReaderAsync())
+                        {
+                            while (await reader.ReadAsync())
+                            {
+                                var row = new Dictionary<string, object>();
+
+                                for (int i = 0; i < reader.FieldCount; i++)
+                                {
+                                    row[reader.GetName(i)] = reader.GetValue(i);
+                                }
+
+                                resultList.Add(row);
+                            }
+                        }
+                    }
+                }
+
+                return Ok(resultList);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
+        }
+        [HttpGet("GetSmartWatchesComparison/{BuyerId}")]
+        public async Task<IActionResult> GetSmartWatchesComparison(int BuyerId)
+        {
+            var resultList = new List<Dictionary<string, object>>();
+
+            try
+            {
+                using (SqlConnection connection = new SqlConnection(_connectionString))
+                {
+                    await connection.OpenAsync();
+
+                    using (SqlCommand command = new SqlCommand("Sp_GetSmart_WatchesComparison", connection))
+                    {
+                        command.CommandType = CommandType.StoredProcedure;
+                        command.Parameters.AddWithValue("@Buyer_ID", BuyerId);
+
+                        // Pass parameters to the stored procedure
+
+                        using (SqlDataReader reader = await command.ExecuteReaderAsync())
+                        {
+                            while (await reader.ReadAsync())
+                            {
+                                var row = new Dictionary<string, object>();
+
+                                for (int i = 0; i < reader.FieldCount; i++)
+                                {
+                                    row[reader.GetName(i)] = reader.GetValue(i);
+                                }
+
+                                resultList.Add(row);
+                            }
+                        }
+                    }
+                }
+
+                return Ok(resultList);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
+        }
+        [HttpGet("GetTVsComparison/{BuyerId}")]
+        public async Task<IActionResult> GetTVsComparison(int BuyerId)
+        {
+            var resultList = new List<Dictionary<string, object>>();
+
+            try
+            {
+                using (SqlConnection connection = new SqlConnection(_connectionString))
+                {
+                    await connection.OpenAsync();
+
+                    using (SqlCommand command = new SqlCommand("Sp_GetTVsComparison", connection))
+                    {
+                        command.CommandType = CommandType.StoredProcedure;
+                        command.Parameters.AddWithValue("@Buyer_ID", BuyerId);
+
+                        // Pass parameters to the stored procedure
+
+                        using (SqlDataReader reader = await command.ExecuteReaderAsync())
+                        {
+                            while (await reader.ReadAsync())
+                            {
+                                var row = new Dictionary<string, object>();
+
+                                for (int i = 0; i < reader.FieldCount; i++)
+                                {
+                                    row[reader.GetName(i)] = reader.GetValue(i);
+                                }
+
+                                resultList.Add(row);
+                            }
+                        }
+                    }
+                }
+
+                return Ok(resultList);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
+        }
+        [HttpGet("GetPCsComparison/{BuyerId}")]
+        public async Task<IActionResult> GetPCsComparison(int BuyerId)
+        {
+            var resultList = new List<Dictionary<string, object>>();
+
+            try
+            {
+                using (SqlConnection connection = new SqlConnection(_connectionString))
+                {
+                    await connection.OpenAsync();
+
+                    using (SqlCommand command = new SqlCommand("Sp_GetPCsComparison", connection))
+                    {
+                        command.CommandType = CommandType.StoredProcedure;
+                        command.Parameters.AddWithValue("@Buyer_ID", BuyerId);
 
                         // Pass parameters to the stored procedure
 
@@ -61,8 +231,9 @@ namespace SmartE_commerce.Controllers
         }
 
 
-        [HttpDelete("RemoveFromComparisons/{ItemId}")]
-        public async Task<IActionResult> RemoveFromComparisons(int ItemId)
+
+        [HttpDelete("RemoveFromComparisons/{ItemId}/{BuyerId}")]
+        public async Task<IActionResult> RemoveFromComparisons(int ItemId, int BuyerId)
         {
             try
             {
@@ -74,6 +245,8 @@ namespace SmartE_commerce.Controllers
                     {
                         command.CommandType = CommandType.StoredProcedure;
                         command.Parameters.AddWithValue("@ItemID", ItemId);
+                        command.Parameters.AddWithValue("@Buyer_ID", BuyerId);
+
 
                         await command.ExecuteNonQueryAsync();
                     }
@@ -88,8 +261,8 @@ namespace SmartE_commerce.Controllers
         }
 
 
-        [HttpPost("AddToComparison/{ItemId}")]
-        public async Task<IActionResult> AddItem(int ItemId)
+        [HttpPost("AddToComparison/{ItemId}/{BuyerId}")]
+        public async Task<IActionResult> AddItem(int ItemId, int BuyerId)
         {
             try
             {
@@ -101,6 +274,8 @@ namespace SmartE_commerce.Controllers
                     {
                         command.CommandType = CommandType.StoredProcedure;
                         command.Parameters.AddWithValue("@ItemID", ItemId);
+                        command.Parameters.AddWithValue("@Buyer_ID", BuyerId);
+
 
 
 
@@ -108,7 +283,7 @@ namespace SmartE_commerce.Controllers
                     }
                 }
 
-                return Ok("Item deleted successfully.");
+                return Ok($"Item {ItemId} posted successfully.");
             }
             catch (Exception ex)
             {
