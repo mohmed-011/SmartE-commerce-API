@@ -27,7 +27,7 @@ namespace SmartE_commerce.Controllers
                 {
                     await connection.OpenAsync();
 
-                    using (SqlCommand command = new SqlCommand("Sp_AddToWishList", connection))
+                    using (SqlCommand command = new SqlCommand("Sp_AddToWishListv3", connection))
                     {
                         command.CommandType = CommandType.StoredProcedure;
                         command.Parameters.AddWithValue("@BuyerID", BuyerId);
@@ -58,7 +58,7 @@ namespace SmartE_commerce.Controllers
                 {
                     await connection.OpenAsync();
 
-                    using (SqlCommand command = new SqlCommand("Sp_deleteFromWishList", connection))
+                    using (SqlCommand command = new SqlCommand("Sp_deleteFromWishListv3", connection))
                     {
                         command.CommandType = CommandType.StoredProcedure;
                         command.Parameters.AddWithValue("@BuyerID", BuyerId);
@@ -89,7 +89,7 @@ namespace SmartE_commerce.Controllers
                 {
                     await connection.OpenAsync();
 
-                    using (SqlCommand command = new SqlCommand("Sp_GetFromWishListById", connection))
+                    using (SqlCommand command = new SqlCommand("Sp_GetFromWishListByIdv3", connection))
                     {
                         command.CommandType = CommandType.StoredProcedure;
 
