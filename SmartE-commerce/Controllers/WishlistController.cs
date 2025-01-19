@@ -11,7 +11,7 @@ namespace SmartE_commerce.Controllers
     public class WishlistController : ControllerBase
     {
         private readonly ApplicationDbContext _dbContext;
-        private readonly string _connectionString = "server=.;database=Smart_EcommerceV2;integrated security =true; trust server certificate = true ";
+        private readonly string _connectionString = "server=.;database=Smart_EcommerceV3;integrated security =true; trust server certificate = true ";
 
         public WishlistController(ApplicationDbContext dbContext)
         {

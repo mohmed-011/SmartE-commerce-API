@@ -15,7 +15,7 @@ builder.Services.AddSwaggerGen();
 //builder.Services.AddTransient<WitherForcastService>();  // more than ins created
 //builder.Services.AddScoped<IWitherForcastService, WitherForcastService>();     // 1 ins for rquset (defult)
 //builder.Services.AddSingleton<WitherForcastService>();  // 1 ins per program
-builder.Services.AddDbContext<ApplicationDbContext>(builder => builder.UseSqlServer("server=.;database=Smart_EcommerceV2;integrated security =true; trust server certificate = true "));
+builder.Services.AddDbContext<ApplicationDbContext>(builder => builder.UseSqlServer("server=.;database=Smart_EcommerceV3;integrated security =true; trust server certificate = true "));
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
