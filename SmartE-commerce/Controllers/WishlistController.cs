@@ -11,7 +11,7 @@ namespace SmartE_commerce.Controllers
     public class WishlistController : ControllerBase
     {
         private readonly ApplicationDbContext _dbContext;
-        private readonly string _connectionString = "server=.;database=Smart_EcommerceV3;integrated security =true; trust server certificate = true ";
+        private readonly string _connectionString = "server=.;database=Smart_EcommerceV4;integrated security =true; trust server certificate = true ";
 
         public WishlistController(ApplicationDbContext dbContext)
         {
@@ -27,7 +27,7 @@ namespace SmartE_commerce.Controllers
                 {
                     await connection.OpenAsync();
 
-                    using (SqlCommand command = new SqlCommand("Sp_AddToWishListv3", connection))
+                    using (SqlCommand command = new SqlCommand("Sp_AddToWishListv4", connection))
                     {
                         command.CommandType = CommandType.StoredProcedure;
                         command.Parameters.AddWithValue("@BuyerID", BuyerId);
@@ -58,7 +58,7 @@ namespace SmartE_commerce.Controllers
                 {
                     await connection.OpenAsync();
 
-                    using (SqlCommand command = new SqlCommand("Sp_deleteFromWishListv3", connection))
+                    using (SqlCommand command = new SqlCommand("Sp_deleteFromWishListv4", connection))
                     {
                         command.CommandType = CommandType.StoredProcedure;
                         command.Parameters.AddWithValue("@BuyerID", BuyerId);
@@ -89,7 +89,7 @@ namespace SmartE_commerce.Controllers
                 {
                     await connection.OpenAsync();
 
-                    using (SqlCommand command = new SqlCommand("Sp_GetFromWishListByIdv3", connection))
+                    using (SqlCommand command = new SqlCommand("Sp_GetFromWishListByIdv4", connection))
                     {
                         command.CommandType = CommandType.StoredProcedure;
 

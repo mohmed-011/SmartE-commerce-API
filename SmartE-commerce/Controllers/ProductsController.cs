@@ -10,7 +10,7 @@ namespace SmartE_commerce.Controllers
     public class ProductsController : ControllerBase
     {
         private readonly ApplicationDbContext _dbContext;
-        private readonly string _connectionString = "server=.;database=Smart_EcommerceV3;integrated security =true; trust server certificate = true ";
+        private readonly string _connectionString = "server=.;database=Smart_EcommerceV4;integrated security =true; trust server certificate = true ";
 
 
         public ProductsController(ApplicationDbContext dbContext)
@@ -30,7 +30,7 @@ namespace SmartE_commerce.Controllers
                 {
                     await connection.OpenAsync();
 
-                    using (SqlCommand command = new SqlCommand("Sp_GetAllProductsv3", connection))
+                    using (SqlCommand command = new SqlCommand("Sp_GetAllProductsv4", connection))
                     {
                         command.CommandType = CommandType.StoredProcedure;
 
@@ -72,7 +72,7 @@ namespace SmartE_commerce.Controllers
                 {
                     await connection.OpenAsync();
 
-                    using (SqlCommand command = new SqlCommand("Sp_GetProductByIdv3", connection))
+                    using (SqlCommand command = new SqlCommand("Sp_GetProductByIdv4", connection))
                     {
                         command.CommandType = CommandType.StoredProcedure;
                         command.Parameters.AddWithValue("@ItemID", id);

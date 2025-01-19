@@ -10,7 +10,7 @@ namespace SmartE_commerce.Controllers
     public class TopController : ControllerBase
     {
         private readonly ApplicationDbContext _dbContext;
-        private readonly string _connectionString = "server=.;database=Smart_EcommerceV3;integrated security =true; trust server certificate = true ";
+        private readonly string _connectionString = "server=.;database=Smart_EcommerceV4;integrated security =true; trust server certificate = true ";
 
         public TopController(ApplicationDbContext dbContext)
         {
@@ -28,7 +28,7 @@ namespace SmartE_commerce.Controllers
                 {
                     await connection.OpenAsync();
 
-                    using (SqlCommand command = new SqlCommand("Sp_GetTopRateItemv3", connection))
+                    using (SqlCommand command = new SqlCommand("Sp_GetTopRateItemv4", connection))
                     {
                         command.CommandType = CommandType.StoredProcedure;
 
@@ -71,7 +71,7 @@ namespace SmartE_commerce.Controllers
                 {
                     await connection.OpenAsync();
 
-                    using (SqlCommand command = new SqlCommand("Sp_GetTopSoldItemv3", connection))
+                    using (SqlCommand command = new SqlCommand("Sp_GetTopSoldItemv4", connection))
                     {
                         command.CommandType = CommandType.StoredProcedure;
 
@@ -114,7 +114,7 @@ namespace SmartE_commerce.Controllers
                 {
                     await connection.OpenAsync();
 
-                    using (SqlCommand command = new SqlCommand("Sp_GetTopTrendingItemv3", connection))
+                    using (SqlCommand command = new SqlCommand("Sp_GetTopTrendingItemv4", connection))
                     {
                         command.CommandType = CommandType.StoredProcedure;
 
@@ -157,7 +157,7 @@ namespace SmartE_commerce.Controllers
                 {
                     await connection.OpenAsync();
 
-                    using (SqlCommand command = new SqlCommand("Sp_GetMostViewedItemsv3", connection))
+                    using (SqlCommand command = new SqlCommand("Sp_GetMostViewedItemsv4", connection))
                     {
                         command.CommandType = CommandType.StoredProcedure;
 

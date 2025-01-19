@@ -11,7 +11,7 @@ namespace SmartE_commerce.Controllers
     {
 
         private readonly ApplicationDbContext _dbContext;
-        private readonly string _connectionString = "server=.;database=Smart_EcommerceV3;integrated security =true; trust server certificate = true ";
+        private readonly string _connectionString = "server=.;database=Smart_EcommerceV4;integrated security =true; trust server certificate = true ";
 
         public ComparisonController(ApplicationDbContext dbContext)
         {
@@ -30,7 +30,7 @@ namespace SmartE_commerce.Controllers
                 {
                     await connection.OpenAsync();
 
-                    using (SqlCommand command = new SqlCommand("Sp_GetPhonesComparisonv3", connection))
+                    using (SqlCommand command = new SqlCommand("Sp_GetPhonesComparisonv4", connection))
                     {
                         command.CommandType = CommandType.StoredProcedure;
                         command.Parameters.AddWithValue("@Buyer_ID", BuyerId);
@@ -72,7 +72,7 @@ namespace SmartE_commerce.Controllers
                 {
                     await connection.OpenAsync();
 
-                    using (SqlCommand command = new SqlCommand("Sp_GetLaptopsComparisonv3", connection))
+                    using (SqlCommand command = new SqlCommand("Sp_GetLaptopsComparisonv4", connection))
                     {
                         command.CommandType = CommandType.StoredProcedure;
                         command.Parameters.AddWithValue("@Buyer_ID", BuyerId);
@@ -114,7 +114,7 @@ namespace SmartE_commerce.Controllers
                 {
                     await connection.OpenAsync();
 
-                    using (SqlCommand command = new SqlCommand("Sp_GetSmart_WatchesComparisonv3", connection))
+                    using (SqlCommand command = new SqlCommand("Sp_GetSmart_WatchesComparisonv4", connection))
                     {
                         command.CommandType = CommandType.StoredProcedure;
                         command.Parameters.AddWithValue("@Buyer_ID", BuyerId);
@@ -156,7 +156,7 @@ namespace SmartE_commerce.Controllers
                 {
                     await connection.OpenAsync();
 
-                    using (SqlCommand command = new SqlCommand("Sp_GetTVsComparisonv3", connection))
+                    using (SqlCommand command = new SqlCommand("Sp_GetTVsComparisonv4", connection))
                     {
                         command.CommandType = CommandType.StoredProcedure;
                         command.Parameters.AddWithValue("@Buyer_ID", BuyerId);
@@ -198,7 +198,7 @@ namespace SmartE_commerce.Controllers
                 {
                     await connection.OpenAsync();
 
-                    using (SqlCommand command = new SqlCommand("Sp_GetPCsComparisonv3", connection))
+                    using (SqlCommand command = new SqlCommand("Sp_GetPCsComparisonv4", connection))
                     {
                         command.CommandType = CommandType.StoredProcedure;
                         command.Parameters.AddWithValue("@Buyer_ID", BuyerId);
@@ -241,7 +241,7 @@ namespace SmartE_commerce.Controllers
                 {
                     await connection.OpenAsync();
 
-                    using (SqlCommand command = new SqlCommand("Sp_DeleteFromComparisonv3", connection))
+                    using (SqlCommand command = new SqlCommand("Sp_DeleteFromComparisonv4", connection))
                     {
                         command.CommandType = CommandType.StoredProcedure;
                         command.Parameters.AddWithValue("@ItemID", ItemId);
@@ -270,7 +270,7 @@ namespace SmartE_commerce.Controllers
                 {
                     await connection.OpenAsync();
 
-                    using (SqlCommand command = new SqlCommand("Sp_AddToComparisonv3", connection))
+                    using (SqlCommand command = new SqlCommand("Sp_AddToComparisonv4", connection))
                     {
                         command.CommandType = CommandType.StoredProcedure;
                         command.Parameters.AddWithValue("@ItemID", ItemId);

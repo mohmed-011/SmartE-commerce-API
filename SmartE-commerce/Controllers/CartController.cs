@@ -11,7 +11,7 @@ namespace SmartE_commerce.Controllers
     {
 
         private readonly ApplicationDbContext _dbContext;
-        private readonly string _connectionString = "server=.;database=Smart_EcommerceV3;integrated security =true; trust server certificate = true ";
+        private readonly string _connectionString = $"server=.;database=Smart_EcommerceV4;integrated security =true; trust server certificate = true ";
 
         public CartController(ApplicationDbContext dbContext)
         {
@@ -27,7 +27,7 @@ namespace SmartE_commerce.Controllers
                 {
                     await connection.OpenAsync();
 
-                    using (SqlCommand command = new SqlCommand("Sp_AddToCartv3", connection))
+                    using (SqlCommand command = new SqlCommand("Sp_AddToCartv4", connection))
                     {
                         command.CommandType = CommandType.StoredProcedure;
                         command.Parameters.AddWithValue("@BuyerID", BuyerId);
@@ -58,7 +58,7 @@ namespace SmartE_commerce.Controllers
                 {
                     await connection.OpenAsync();
 
-                    using (SqlCommand command = new SqlCommand("Sp_UpdateFromCartv3", connection))
+                    using (SqlCommand command = new SqlCommand("Sp_UpdateFromCartv4", connection))
                     {
                         command.CommandType = CommandType.StoredProcedure;
                         command.Parameters.AddWithValue("@BuyerID", BuyerId);
@@ -89,7 +89,7 @@ namespace SmartE_commerce.Controllers
                 {
                     await connection.OpenAsync();
 
-                    using (SqlCommand command = new SqlCommand("Sp_deleteFromCartv3", connection))
+                    using (SqlCommand command = new SqlCommand("Sp_deleteFromCartv4", connection))
                     {
                         command.CommandType = CommandType.StoredProcedure;
                         command.Parameters.AddWithValue("@BuyerID", BuyerId);
@@ -118,7 +118,7 @@ namespace SmartE_commerce.Controllers
                 {
                     await connection.OpenAsync();
 
-                    using (SqlCommand command = new SqlCommand("Sp_EmptyBuyerCartv3", connection))
+                    using (SqlCommand command = new SqlCommand("Sp_EmptyBuyerCartv4", connection))
                     {
                         command.CommandType = CommandType.StoredProcedure;
                         command.Parameters.AddWithValue("@BuyerID", BuyerId);
@@ -147,7 +147,7 @@ namespace SmartE_commerce.Controllers
                 {
                     await connection.OpenAsync();
 
-                    using (SqlCommand command = new SqlCommand("Sp_GetFromCartByIdv3", connection))
+                    using (SqlCommand command = new SqlCommand("Sp_GetFromCartByIdv4", connection))
                     {
                         command.CommandType = CommandType.StoredProcedure;
 

@@ -11,7 +11,7 @@ namespace SmartE_commerce.Controllers
     [ApiController]
     public class ExcelController : ControllerBase
     {
-        private readonly string _connectionString = "server=.;database=Smart_EcommerceV3;integrated security =true; trust server certificate = true ";
+        private readonly string _connectionString = "server=.;database=Smart_EcommerceV4;integrated security =true; trust server certificate = true ";
 
         [HttpPost("import")]
         public async Task<IActionResult> ImportExcel([FromForm] IFormFile file)
@@ -84,7 +84,11 @@ namespace SmartE_commerce.Controllers
 
                 foreach (DataRow row in dataTable.Rows)
                 {
-                    var command = new SqlCommand(
+                    int Item_ID = row["Item_ID"] != DBNull.Value ? Convert.ToInt32(row["Item_ID"]) : 0;
+                    int Seller_ID = row["Seller_ID"] != DBNull.Value ? Convert.ToInt32(row["Seller_ID"]) : 0;
+
+
+                        var command = new SqlCommand(
                 @"INSERT INTO Item (
                     Item_ID, Image_Cover, Item_Name, Description, Quantity, 
                     Price_in, Price_out, Discount, Rate, Category_ID, 
@@ -98,7 +102,7 @@ namespace SmartE_commerce.Controllers
                 connection);
 
                     // Mapping parameters
-                    command.Parameters.AddWithValue("@Item_ID", row["Item_ID"] != DBNull.Value ? Convert.ToInt32(row["Item_ID"]) : 0);
+                    command.Parameters.AddWithValue("@Item_ID",( ""+Seller_ID + "-" + Item_ID+"" ));
                     command.Parameters.AddWithValue("@Image_Cover", row["Image_Cover"] != DBNull.Value && !string.IsNullOrEmpty(row["Image_Cover"].ToString()) ? row["Image_Cover"].ToString() : "Image_Cover.jpg");
                     command.Parameters.AddWithValue("@Item_Name", row["Item_Name"] != DBNull.Value ? row["Item_Name"].ToString() : string.Empty);
                     command.Parameters.AddWithValue("@Description", row["Description"] != DBNull.Value ? row["Description"].ToString() : DBNull.Value);
@@ -108,10 +112,35 @@ namespace SmartE_commerce.Controllers
                     command.Parameters.AddWithValue("@Discount", row["Discount"] != DBNull.Value ? Convert.ToDecimal(row["Discount"]) : DBNull.Value);
                     command.Parameters.AddWithValue("@Rate", row["Rate"] != DBNull.Value ? Convert.ToDecimal(row["Rate"]) : DBNull.Value);
                     command.Parameters.AddWithValue("@Category_ID", row["Category_ID"] != DBNull.Value ? Convert.ToInt32(row["Category_ID"]) : 0);
-                    command.Parameters.AddWithValue("@Seller_ID", row["Seller_ID"] != DBNull.Value ? Convert.ToInt32(row["Seller_ID"]) : 0);
+                    command.Parameters.AddWithValue("@Seller_ID", Seller_ID);
                     command.Parameters.AddWithValue("@Sub_Category_ID", row["Sub_Category_ID"] != DBNull.Value ? Convert.ToInt32(row["Sub_Category_ID"]) : 0);
 
                     await command.ExecuteNonQueryAsync();
+
+                    var insertLaptopCommand = new SqlCommand(
+               @"INSERT INTO Laptops (
+                    Item_ID, Brand, RAM, Memory, Memory_Type, 
+                    Graphics_Card, CPU, Weight, Screen_Size, Model
+                ) 
+                VALUES (
+                    @Item_ID, @Brand, @RAM, @Memory, @Memory_Type, 
+                    @Graphics_Card, @CPU, @Weight, @Screen_Size, @Model
+                )",
+               connection);
+
+                    // إعداد المعاملات لجدول Laptops
+                    insertLaptopCommand.Parameters.AddWithValue("@Item_ID", "" + Seller_ID + "-" + Item_ID + "");
+                    insertLaptopCommand.Parameters.AddWithValue("@Brand", row["Brand"] != DBNull.Value ? row["Brand"].ToString() : string.Empty);
+                    insertLaptopCommand.Parameters.AddWithValue("@RAM", row["RAM"] != DBNull.Value ? Convert.ToInt32(row["RAM"]) : 0);
+                    insertLaptopCommand.Parameters.AddWithValue("@Memory", row["Memory"] != DBNull.Value ? Convert.ToInt32(row["Memory"]) : 0);
+                    insertLaptopCommand.Parameters.AddWithValue("@Memory_Type", row["Memory_Type"] != DBNull.Value ? row["Memory_Type"].ToString() : string.Empty);
+                    insertLaptopCommand.Parameters.AddWithValue("@Graphics_Card", row["Graphics_Card"] != DBNull.Value ? row["Graphics_Card"].ToString() : DBNull.Value);
+                    insertLaptopCommand.Parameters.AddWithValue("@CPU", row["CPU"] != DBNull.Value ? row["CPU"].ToString() : string.Empty);
+                    insertLaptopCommand.Parameters.AddWithValue("@Weight", row["Weight"] != DBNull.Value ? Convert.ToDecimal(row["Weight"]) : DBNull.Value);
+                    insertLaptopCommand.Parameters.AddWithValue("@Screen_Size", row["Screen_Size"] != DBNull.Value ? Convert.ToDecimal(row["Screen_Size"]) : DBNull.Value);
+                    insertLaptopCommand.Parameters.AddWithValue("@Model", row["Model"] != DBNull.Value ? row["Model"].ToString() : DBNull.Value);
+
+                    await insertLaptopCommand.ExecuteNonQueryAsync();
                 }
             }
         }
