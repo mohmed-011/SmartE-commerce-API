@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.SqlClient;
+using Microsoft.EntityFrameworkCore;
 using SmartE_commerce.Data;
 using System.Data;
 
@@ -117,36 +118,86 @@ namespace SmartE_commerce.Controllers
 
         [HttpPut]
         [Route("UpdateProduct")]
-        public ActionResult UpdateProduct(Product product)
+        public async Task<IActionResult> UpdateItem(string id, [FromBody] Item updatedItem)
         {
-            var existingProduct = _dbContext.Set<Product>().Find(product.Item_ID);
-            existingProduct.Item_Name = product.Item_Name;
-            existingProduct.Description = product.Description;
-            existingProduct.Quantity = product.Quantity;
-            existingProduct.Price_in = product.Price_in;
-            existingProduct.Price_out = product.Price_out;
-            existingProduct.Discount = product.Discount;
-            existingProduct.Rate = product.Rate;
-            existingProduct.Category_ID = product.Category_ID;
-            existingProduct.Sub_Category_ID = product.Sub_Category_ID;
-            existingProduct.Seller_ID = product.Seller_ID;
-            _dbContext.Set<Product>().Update(existingProduct);
-            _dbContext.SaveChanges();
-            return Ok("Updated");
+            if (id != updatedItem.Item_ID)
+            {
+                return BadRequest(new { message = "Item ID mismatch." });
+            }
 
+            var existingItem = await _dbContext.Items.FindAsync(id);
+            if (existingItem == null)
+            {
+                return NotFound(new { message = "Item not found." });
+            }
 
+            // Update fields
+            existingItem.Item_Name = updatedItem.Item_Name;
+            existingItem.Description = updatedItem.Description;
+            existingItem.Quantity = updatedItem.Quantity;
+            existingItem.Price_in = updatedItem.Price_in;
+            existingItem.Price_out = updatedItem.Price_out;
+            existingItem.Discount = updatedItem.Discount;
+            existingItem.Rate = updatedItem.Rate;
+            existingItem.Category_ID = updatedItem.Category_ID;
+            existingItem.Seller_ID = updatedItem.Seller_ID;
+            existingItem.Sub_Category_ID = updatedItem.Sub_Category_ID;
 
+            // Save changes
+            try
+            {
+                await _dbContext.SaveChangesAsync();
+            }
+            catch (DbUpdateException ex)
+            {
+                return StatusCode(500, new { message = "An error occurred while updating the item.", error = ex.Message });
+            }
+
+            return Ok(new { message = "Item updated successfully." });
         }
+        //public ActionResult UpdateProduct(Product product)
+        //{
+        //    var existingProduct = _dbContext.Set<Product>().Find(product.Item_ID);
+        //    existingProduct.Item_Name = product.Item_Name;
+        //    existingProduct.Description = product.Description;
+        //    existingProduct.Quantity = product.Quantity;
+        //    existingProduct.Price_in = product.Price_in;
+        //    existingProduct.Price_out = product.Price_out;
+        //    existingProduct.Discount = product.Discount;
+        //    existingProduct.Rate = product.Rate;
+        //    existingProduct.Category_ID = product.Category_ID;
+        //    existingProduct.Sub_Category_ID = product.Sub_Category_ID;
+        //    existingProduct.Seller_ID = product.Seller_ID;
+        //    _dbContext.Set<Product>().Update(existingProduct);
+        //    _dbContext.SaveChanges();
+        //    return Ok("Updated");
 
+
+
+        //}
+
+
+        //public ActionResult RemoveProduct(int id)
+        //{
+        //    var existingProduct = _dbContext.Set<Product>().Find(id);
+        //    _dbContext.Set<Product>().Remove(existingProduct);
+        //    _dbContext.SaveChanges();
+        //    return Ok("Removed");
+
+        //}
         [HttpDelete]
         [Route("RemoveProduct{id}")]
-        public ActionResult RemoveProduct(int id)
+        public async Task<IActionResult> DeleteItem(string id)
         {
-            var existingProduct = _dbContext.Set<Product>().Find(id);
-            _dbContext.Set<Product>().Remove(existingProduct);
-            _dbContext.SaveChanges();
-            return Ok("Removed");
+            var item = await _dbContext.Items.FindAsync(id);
+            if (item == null)
+            {
+                return NotFound(new { message = "Item not found." });
+            }
 
+            _dbContext.Items.Remove(item);
+            await _dbContext.SaveChangesAsync();
+            return Ok(new { message = "Item deleted successfully." });
         }
 
     }
