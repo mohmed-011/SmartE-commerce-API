@@ -63,9 +63,11 @@ namespace SmartE_commerce.Controllers
 
         [HttpGet]
         [Route("GetProductById{id}")]
-        public async Task<IActionResult> GetProductById(int id)
+        public async Task<IActionResult> GetProductById(string id)
         {
-            var resultList = new List<Dictionary<string, object>>();
+            var response = new Dictionary<string, object>(); // كائن رئيسي يحتوي على البيانات والصور
+            var productData = new Dictionary<string, object>(); // لتخزين بيانات المنتج
+            var imagesData = new Dictionary<string, string>(); // لتخزين الصور
 
             try
             {
@@ -73,30 +75,50 @@ namespace SmartE_commerce.Controllers
                 {
                     await connection.OpenAsync();
 
+                    // جلب بيانات المنتج الأساسية
                     using (SqlCommand command = new SqlCommand("Sp_GetProductByIdv4", connection))
                     {
                         command.CommandType = CommandType.StoredProcedure;
                         command.Parameters.AddWithValue("@ItemID", id);
 
-
                         using (SqlDataReader reader = await command.ExecuteReaderAsync())
                         {
-                            while (await reader.ReadAsync())
+                            if (await reader.ReadAsync()) // استخدام ReadAsync بدلاً من while لأننا نتوقع صفًا واحدًا فقط
                             {
-                                var row = new Dictionary<string, object>();
-
                                 for (int i = 0; i < reader.FieldCount; i++)
                                 {
-                                    row[reader.GetName(i)] = reader.GetValue(i);
+                                    productData[reader.GetName(i)] = reader.GetValue(i);
                                 }
+                            }
+                        }
+                    }
 
-                                resultList.Add(row);
+                    // جلب صور المنتج
+                    using (SqlCommand command2 = new SqlCommand("Sp_GetItemImagesv4", connection))
+                    {
+                        command2.CommandType = CommandType.StoredProcedure;
+                        command2.Parameters.AddWithValue("@ItemID", id);
+
+                        using (SqlDataReader reader2 = await command2.ExecuteReaderAsync())
+                        {
+                            int j = 1;
+                            while (await reader2.ReadAsync())
+                            {
+                                for (int i = 0; i < reader2.FieldCount; i++)
+                                {
+                                    imagesData[$"Item_Images-{j}"] = reader2.GetValue(i).ToString();
+                                }
+                                j++;
                             }
                         }
                     }
                 }
 
-                return Ok(resultList);
+                // إضافة البيانات والصور إلى كائن الاستجابة النهائي
+                response["Data"] = productData;
+                response["images"] = imagesData;
+
+                return Ok(response);
             }
             catch (Exception ex)
             {

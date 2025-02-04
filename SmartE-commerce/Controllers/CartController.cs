@@ -18,8 +18,8 @@ namespace SmartE_commerce.Controllers
             _dbContext = dbContext;
         }
 
-        [HttpPost("{BuyerId}/{ItemId}/{Quantity}")]
-        public async Task<IActionResult> AddItem(int BuyerId, int ItemId ,int Quantity)
+        [HttpPost("AddToCart")]
+        public async Task<IActionResult> AddItem(int BuyerId, string ItemId ,int Quantity)
         {
             try
             {
@@ -49,8 +49,8 @@ namespace SmartE_commerce.Controllers
         }
 
 
-        [HttpPut("{BuyerId}/{ItemId}/{Quantity}")]
-        public async Task<IActionResult> UpdateItem(int BuyerId, int ItemId, int Quantity)
+        [HttpPut("UpdateToCart")]
+        public async Task<IActionResult> UpdateItem(int BuyerId, string ItemId, int Quantity)
         {
             try
             {
@@ -80,8 +80,8 @@ namespace SmartE_commerce.Controllers
         }
         
         
-        [HttpDelete("{BuyerId}/{ItemId}")]
-        public async Task<IActionResult> DeleteItem(int BuyerId, int ItemId )
+        [HttpDelete("RemoveFromCart")]
+        public async Task<IActionResult> DeleteItem(int BuyerId, string ItemId )
         {
             try
             {
@@ -109,7 +109,7 @@ namespace SmartE_commerce.Controllers
         }
 
 
-        [HttpDelete("ClearCart/{BuyerId}")]
+        [HttpDelete("EmptyCart")]
         public async Task<IActionResult> EmptyCart(int BuyerId)
         {
             try
@@ -136,7 +136,7 @@ namespace SmartE_commerce.Controllers
         }
 
 
-        [HttpGet("GetUserItems/{UserId}")]
+        [HttpGet("GetUserCart")]
         public async Task<IActionResult> GetUserItems(int UserId)
         {
             var resultList = new List<Dictionary<string, object>>();
