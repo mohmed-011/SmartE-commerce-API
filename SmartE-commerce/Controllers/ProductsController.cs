@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using SmartE_commerce.Data;
@@ -22,6 +23,7 @@ namespace SmartE_commerce.Controllers
 
         [HttpGet]
         [Route("GetFilteredProducts")]
+        [Authorize]
         public async Task<IActionResult> GetFilteredProducts(
     [FromQuery] decimal? minPrice,
     [FromQuery] decimal? maxPrice,
