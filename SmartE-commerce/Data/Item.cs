@@ -19,5 +19,7 @@ namespace SmartE_commerce.Data
         public int Category_ID { get; set; }
         public int Seller_ID { get; set; }
         public int Sub_Category_ID { get; set; }
+        public int? View_Count { get; set; }
+        public int? Sold_Count { get; set; }
     }
 }

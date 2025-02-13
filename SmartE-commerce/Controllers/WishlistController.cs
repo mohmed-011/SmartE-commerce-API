@@ -18,7 +18,7 @@ namespace SmartE_commerce.Controllers
             _dbContext = dbContext;
         }
 
-        [HttpPost("AddProduct/{BuyerId}/{ItemId}")]
+        [HttpPost("AddProduct")]
         public async Task<IActionResult> AddItemToWishlist(int BuyerId, int ItemId)
         {
             try
@@ -49,7 +49,7 @@ namespace SmartE_commerce.Controllers
         }
 
 
-        [HttpDelete("RemoveProduct/{BuyerId}/{ItemId}")]
+        [HttpDelete("RemoveProduct")]
         public async Task<IActionResult> DeleteItem(int BuyerId, int ItemId)
         {
             try
@@ -78,7 +78,7 @@ namespace SmartE_commerce.Controllers
         }
 
 
-        [HttpGet("GetUserProducts/{UserId}")]
+        [HttpGet("GetUserProducts")]
         public async Task<IActionResult> GetUserItems(int UserId)
         {
             var resultList = new List<Dictionary<string, object>>();

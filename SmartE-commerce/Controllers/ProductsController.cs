@@ -11,7 +11,7 @@ namespace SmartE_commerce.Controllers
     public class ProductsController : ControllerBase
     {
         private readonly ApplicationDbContext _dbContext;
-        private readonly string _connectionString = "server=.;database=Smart_EcommerceV4;integrated security =true; trust server certificate = true ";
+        private readonly string _connectionString = "server=.;database=Smart_EcommerceV4;integrated security =true; trust server certificate = true ;MultipleActiveResultSets=True ";
 
 
         public ProductsController(ApplicationDbContext dbContext)
@@ -19,9 +19,169 @@ namespace SmartE_commerce.Controllers
             _dbContext = dbContext;
         }
 
+
+        [HttpGet]
+        [Route("GetFilteredProducts")]
+        public async Task<IActionResult> GetFilteredProducts(
+    [FromQuery] decimal? minPrice,
+    [FromQuery] decimal? maxPrice,
+    [FromQuery] decimal? minRate,
+    [FromQuery] decimal? maxRate,
+    [FromQuery] bool? mostViewed,
+    [FromQuery] bool? mostSold,
+    [FromQuery] string? searchQuery)
+        {
+            try
+            {
+                var query = _dbContext.Items.AsQueryable();
+
+                // 🔹 الفلترة حسب السعر
+                if (minPrice.HasValue)
+                    query = query.Where(i => i.Price_out >= minPrice.Value);
+
+                if (maxPrice.HasValue)
+                    query = query.Where(i => i.Price_out <= maxPrice.Value);
+
+                // 🔹 الفلترة حسب التقييم
+                if (minRate.HasValue)
+                    query = query.Where(i => i.Rate >= minRate.Value);
+
+                if (maxRate.HasValue)
+                    query = query.Where(i => i.Rate <= maxRate.Value);
+
+                // 🔹 البحث بالاسم أو الوصف
+                if (!string.IsNullOrWhiteSpace(searchQuery))
+                    query = query.Where(i => i.Item_Name.Contains(searchQuery) || i.Description.Contains(searchQuery));
+
+                // 🔹 ترتيب النتائج
+                if (mostViewed.HasValue && mostViewed.Value && mostSold.HasValue && mostSold.Value)
+                {
+                    query = query.OrderByDescending(i => i.View_Count)
+                                 .ThenByDescending(i => i.Sold_Count);
+                }
+                else if (mostViewed.HasValue && mostViewed.Value)
+                {
+                    query = query.OrderByDescending(i => i.View_Count);
+                }
+                else if (mostSold.HasValue && mostSold.Value)
+                {
+                    query = query.OrderByDescending(i => i.Sold_Count);
+                }
+                else
+                {
+                    // 🔹 إذا لم يتم اختيار ترتيب معين، ترتيب افتراضي حسب التقييم
+                    query = query.OrderByDescending(i => i.Rate);
+                }
+
+                // 🔹 جلب قائمة الـ Item_IDs
+                var itemIds = await query.Select(i => i.Item_ID).ToListAsync();
+
+                if (!itemIds.Any())
+                    return Ok(new { message = "No items found matching your filters." });
+
+                // 🔹 جلب تفاصيل كل منتج باستخدام `GetProductById`
+                var productDetails = new List<object>();
+
+                foreach (var itemId in itemIds)
+                {
+                    var productResult = await GetProductById(itemId);
+                    if (productResult is OkObjectResult okResult)
+                    {
+                        productDetails.Add(okResult.Value);
+                    }
+                }
+
+                return Ok(productDetails);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new
+                {
+                    message = "Error retrieving data.",
+                    error = ex.Message,
+                    innerException = ex.InnerException?.Message
+                });
+            }
+        }
+
+
+        //[HttpGet]
+        //[Route("GetAllProducts")]
+        //public async Task<IActionResult> GetAllProducts()
+        //{
+        //    var resultList = new List<Dictionary<string, object>>(); // List to store each product's data
+
+        //    try
+        //    {
+        //        using (SqlConnection connection = new SqlConnection(_connectionString))
+        //        {
+        //            await connection.OpenAsync();
+
+        //            using (SqlCommand command = new SqlCommand("Sp_GetAllProductsv4", connection))
+        //            {
+        //                command.CommandType = CommandType.StoredProcedure;
+
+
+        //                using (SqlDataReader reader = await command.ExecuteReaderAsync())
+        //                {
+        //                    while (await reader.ReadAsync())
+        //                    {
+        //                        var row = new Dictionary<string, object>();
+        //                        var imagesData = new Dictionary<string, string>(); // Dictionary to store images for each product
+
+        //                        for (int i = 0; i < reader.FieldCount; i++)
+        //                        {
+        //                            row[reader.GetName(i)] = reader.GetValue(i);
+        //                            if (reader.GetName(i) == "Item_ID") // Once Item_ID is found
+        //                            {
+        //                                var itemId = reader.GetValue(i).ToString();
+
+        //                                // Now fetch the images for this Item_ID
+        //                                using (SqlCommand command2 = new SqlCommand("Sp_GetItemImagesv4", connection))
+        //                                {
+        //                                    command2.CommandType = CommandType.StoredProcedure;
+        //                                    command2.Parameters.AddWithValue("@ItemID", itemId);
+
+        //                                    using (SqlDataReader reader2 = await command2.ExecuteReaderAsync())
+        //                                    {
+        //                                        int j = 1;
+        //                                        while (await reader2.ReadAsync())
+        //                                        {
+        //                                            // Add images to the dictionary with a dynamic key
+        //                                            imagesData[$"Item_Images-{j}"] = reader2.GetValue(0).ToString();
+        //                                            j++;
+        //                                        }
+        //                                    }
+        //                                }
+        //                            }
+        //                        }
+
+        //                        // Add imagesData to the current product row
+        //                        if (imagesData.Count > 0)
+        //                        {
+        //                            row["images"] = imagesData;
+        //                        }
+
+        //                        // Add the product row to the result list
+        //                        resultList.Add(row);
+        //                    }
+        //                }
+        //            }
+        //        }
+
+        //        return Ok(new { Data = resultList });
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        return StatusCode(500, $"Internal server error: {ex.Message}");
+        //    }
+        //}
+
+
+
         [HttpGet]
         [Route("GetAllProducts")]
-        public async Task<IActionResult> GetAllProducts()
+        public async Task<IActionResult> GetAllProducts([FromQuery] List<string> itemIds)
         {
             var resultList = new List<Dictionary<string, object>>();
 
@@ -35,17 +195,45 @@ namespace SmartE_commerce.Controllers
                     {
                         command.CommandType = CommandType.StoredProcedure;
 
+                        // 🟢 تحويل القائمة إلى String مفصولة بفواصل وتمريرها كـ `NVARCHAR`
+                        string itemIdsString = string.Join(",", itemIds);
+                        command.Parameters.AddWithValue("@ItemIDs", itemIdsString);
 
                         using (SqlDataReader reader = await command.ExecuteReaderAsync())
                         {
                             while (await reader.ReadAsync())
                             {
                                 var row = new Dictionary<string, object>();
+                                var imagesData = new Dictionary<string, string>();
 
                                 for (int i = 0; i < reader.FieldCount; i++)
                                 {
                                     row[reader.GetName(i)] = reader.GetValue(i);
+
+                                    if (reader.GetName(i) == "Item_ID")
+                                    {
+                                        var itemId = reader.GetValue(i).ToString();
+
+                                        using (SqlCommand command2 = new SqlCommand("Sp_GetItemImagesv4", connection))
+                                        {
+                                            command2.CommandType = CommandType.StoredProcedure;
+                                            command2.Parameters.AddWithValue("@ItemID", itemId);
+
+                                            using (SqlDataReader reader2 = await command2.ExecuteReaderAsync())
+                                            {
+                                                int j = 1;
+                                                while (await reader2.ReadAsync())
+                                                {
+                                                    imagesData[$"Item_Images-{j}"] = reader2.GetValue(0).ToString();
+                                                    j++;
+                                                }
+                                            }
+                                        }
+                                    }
                                 }
+
+                                if (imagesData.Count > 0)
+                                    row["images"] = imagesData;
 
                                 resultList.Add(row);
                             }
@@ -53,7 +241,7 @@ namespace SmartE_commerce.Controllers
                     }
                 }
 
-                return Ok(resultList);
+                return Ok(new { Data = resultList });
             }
             catch (Exception ex)
             {
@@ -61,8 +249,9 @@ namespace SmartE_commerce.Controllers
             }
         }
 
+
         [HttpGet]
-        [Route("GetProductById{id}")]
+        [Route("GetProductById")]
         public async Task<IActionResult> GetProductById(string id)
         {
             var response = new Dictionary<string, object>(); // كائن رئيسي يحتوي على البيانات والصور
@@ -125,6 +314,15 @@ namespace SmartE_commerce.Controllers
                 return StatusCode(500, $"Internal server error: {ex.Message}");
             }
         }
+
+
+
+
+
+
+
+
+
 
 
 

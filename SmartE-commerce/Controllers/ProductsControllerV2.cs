@@ -1,11 +1,12 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using SmartE_commerce.Data;
 using SmartE_commerce.Dto;
 
 namespace SmartE_commerce.Controllers
 {
     [ApiController]
-    [Route("api/[controller]")]
+    [Route("Products")]
     public class ProductsControllerV2 : ControllerBase
     {
         private readonly IWebHostEnvironment _environment;
@@ -17,6 +18,8 @@ namespace SmartE_commerce.Controllers
             _dbContext = dbContext;
         }
         [HttpPost]
+        [Route("PostProduct")]
+
         public async Task<IActionResult> AddItem([FromForm] ItemDto itemDto)
         {
             try
@@ -78,5 +81,8 @@ namespace SmartE_commerce.Controllers
                 });
             }
         }
+
+        
+
     }
 }

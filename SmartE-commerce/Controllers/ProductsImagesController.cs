@@ -5,7 +5,7 @@ using SmartE_commerce.Dto;
 
 namespace SmartE_commerce.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("Products")]
     [ApiController]
     public class ProductsImagesController : ControllerBase
     {
@@ -20,6 +20,8 @@ namespace SmartE_commerce.Controllers
 
 
         [HttpPost]
+        [Route("PostProductImage")]
+
         public async Task<IActionResult> AddItemImage([FromForm] ItemImageDto itemImageDto)
         {
             try
@@ -60,7 +62,7 @@ namespace SmartE_commerce.Controllers
                 _dbContext.ItemImages.Add(itemImage);
                 await _dbContext.SaveChangesAsync();
 
-                return Ok(new { message = "Item added successfully!" });
+                return Ok(new { message = "Item Image added successfully!" });
             }
             catch (Exception ex)
             {
