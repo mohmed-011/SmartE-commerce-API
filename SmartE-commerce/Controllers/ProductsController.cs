@@ -4,11 +4,14 @@ using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using SmartE_commerce.Data;
 using System.Data;
+using System.Reflection.PortableExecutable;
 
 namespace SmartE_commerce.Controllers
 {
     [ApiController]
     [Route("Products")]
+    [Authorize]
+
     public class ProductsController : ControllerBase
     {
         private readonly ApplicationDbContext _dbContext;
@@ -23,19 +26,29 @@ namespace SmartE_commerce.Controllers
 
         [HttpGet]
         [Route("GetFilteredProducts")]
-        [Authorize]
         public async Task<IActionResult> GetFilteredProducts(
     [FromQuery] decimal? minPrice,
+    [FromQuery] int? categry,
+    [FromQuery] int? subCategry,
     [FromQuery] decimal? maxPrice,
     [FromQuery] decimal? minRate,
     [FromQuery] decimal? maxRate,
     [FromQuery] bool? mostViewed,
     [FromQuery] bool? mostSold,
+    [FromQuery] bool? newwest,
+
     [FromQuery] string? searchQuery)
         {
             try
             {
+                
                 var query = _dbContext.Items.AsQueryable();
+
+                if (categry.HasValue)
+                    query = query.Where(i => i.Category_ID == categry.Value);
+
+                if (subCategry.HasValue)
+                    query = query.Where(i => i.Sub_Category_ID == subCategry.Value);
 
                 // 🔹 الفلترة حسب السعر
                 if (minPrice.HasValue)
@@ -68,6 +81,10 @@ namespace SmartE_commerce.Controllers
                 else if (mostSold.HasValue && mostSold.Value)
                 {
                     query = query.OrderByDescending(i => i.Sold_Count);
+                }
+                else if (newwest.HasValue && newwest.Value)
+                {
+                    query = query.OrderByDescending(i => i.Crate_Date);
                 }
                 else
                 {
@@ -258,7 +275,9 @@ namespace SmartE_commerce.Controllers
         {
             var response = new Dictionary<string, object>(); // كائن رئيسي يحتوي على البيانات والصور
             var productData = new Dictionary<string, object>(); // لتخزين بيانات المنتج
-            var imagesData = new Dictionary<string, string>(); // لتخزين الصور
+            var imagesData = new Dictionary<string, string>();
+            var BrandData = new Dictionary<string, string>(); // لتخزين الصور
+            // لتخزين الصور
 
             try
             {
@@ -284,7 +303,7 @@ namespace SmartE_commerce.Controllers
                         }
                     }
 
-                    // جلب صور المنتج
+                    // جلب صور المنتج  var x = productData["Brand_ID"];
                     using (SqlCommand command2 = new SqlCommand("Sp_GetItemImagesv4", connection))
                     {
                         command2.CommandType = CommandType.StoredProcedure;
@@ -298,18 +317,41 @@ namespace SmartE_commerce.Controllers
                                 for (int i = 0; i < reader2.FieldCount; i++)
                                 {
                                     imagesData[$"Item_Images-{j}"] = reader2.GetValue(i).ToString();
+
                                 }
                                 j++;
                             }
                         }
                     }
+
+                    using (SqlCommand command2 = new SqlCommand("Sp_GetItemBrandv4", connection))
+                    {
+                        command2.CommandType = CommandType.StoredProcedure;
+                        command2.Parameters.AddWithValue("@Brand_ID", productData["Brand_ID"]);
+
+                        using (SqlDataReader reader2 = await command2.ExecuteReaderAsync())
+                        {
+                            int j = 1;
+                            while (await reader2.ReadAsync())
+                            {
+                                for (int i = 0; i < reader2.FieldCount; i++)
+                                {
+                                    BrandData[reader2.GetName(i)] = reader2.GetValue(i).ToString();
+
+                                }
+                                j++;
+                            }
+                        }
+                    }
+
+                    // إضافة البيانات والصور إلى كائن الاستجابة النهائي
+                    response["Data"] = productData;
+                    response["images"] = imagesData;
+                    response["Brand"] = BrandData;
+
+
+                    return Ok(response);
                 }
-
-                // إضافة البيانات والصور إلى كائن الاستجابة النهائي
-                response["Data"] = productData;
-                response["images"] = imagesData;
-
-                return Ok(response);
             }
             catch (Exception ex)
             {

@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using SmartE_commerce.Data;
 using SmartE_commerce.Dto;
@@ -7,6 +8,8 @@ namespace SmartE_commerce.Controllers
 {
     [ApiController]
     [Route("Products")]
+    [Authorize]
+
     public class ProductsControllerV2 : ControllerBase
     {
         private readonly IWebHostEnvironment _environment;

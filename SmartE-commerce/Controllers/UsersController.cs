@@ -1,23 +1,34 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Azure.Core;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.Data.SqlClient;
 using Microsoft.IdentityModel.Tokens;
 using SmartE_commerce.Classes;
 using SmartE_commerce.Data;
+using System.Data;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
+using System.Text.RegularExpressions;
 
 namespace SmartE_commerce.Controllers
 {
     [ApiController]
     [Route("Auth")]
-    public class UsersController(JwtOptions jwtOptions) : ControllerBase
+    public class UsersController(JwtOptions jwtOptions , ApplicationDbContext dbContext) : ControllerBase
     {
-        
+        private readonly string _connectionString = "server=.;database=Smart_EcommerceV4;integrated security =true; trust server certificate = true ;MultipleActiveResultSets=True ";
+
 
         [HttpPost]
         [Route("login")]
         public ActionResult<string> AuthenticatUser(AuthenticationRequest request)
         {
+            var user = dbContext.Set<Buyer>().FirstOrDefault(x => x.Email == request.UserEmail &&
+            x.password == request.Password);
+
+            if (user == null)
+                return Unauthorized();
+
             var tokenHandler = new JwtSecurityTokenHandler();
             var TokenDecriptor = new SecurityTokenDescriptor
             {
@@ -27,8 +38,9 @@ namespace SmartE_commerce.Controllers
                 SecurityAlgorithms.HmacSha256),
                 Subject = new ClaimsIdentity(new Claim[]
                 {
-                    new (ClaimTypes.NameIdentifier,request.UserName),
-                    new (ClaimTypes.Email,"Farag@gmail.com")
+                    new (ClaimTypes.NameIdentifier,user.Buyer_ID.ToString()),
+                    new (ClaimTypes.Name,user.Buyer_Name),
+                    new (ClaimTypes.Email,user.Email)
 
                 })
             };
@@ -36,5 +48,176 @@ namespace SmartE_commerce.Controllers
             var accessToken = tokenHandler.WriteToken(securityToken);
             return Ok(accessToken);
         }
+
+
+
+        [HttpPost]
+        [Route("signin")]
+        public async Task<IActionResult> AddAuthenticatUser(BuyerPost buyer)
+        {
+            if (!Regex.IsMatch(buyer.Email, @"^[a-zA-Z0-9._%+-]+@(gmail\.com|outlook\.com|hotmail\.com|yahoo\.com|icloud\.com|gov|edu|org|net|com)$"))
+                return BadRequest("invalid Email");
+
+            if (!Regex.IsMatch(buyer.password, @"^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)[A-Za-z\d]{8,}$"))
+                return BadRequest("invalid password");
+
+            try
+            {
+                using (SqlConnection connection = new SqlConnection(_connectionString))
+                {
+                    await connection.OpenAsync();
+
+                    using (SqlCommand command = new SqlCommand("Sp_AddBuyerv4", connection))
+                    {
+                        command.CommandType = CommandType.StoredProcedure;
+
+                        command.Parameters.AddWithValue("@Name", buyer.Buyer_Name);
+                        command.Parameters.AddWithValue("@Email", buyer.Email);
+                        command.Parameters.AddWithValue("@Password", buyer.password);
+                        command.Parameters.AddWithValue("@Location", buyer.Location);
+                        command.Parameters.AddWithValue("@phon", buyer.phone);
+
+                        await command.ExecuteNonQueryAsync();
+                    }
+                }
+
+               
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
+
+
+
+           var user = dbContext.Set<Buyer>().FirstOrDefault(x => x.Email == buyer.Email &&
+           x.password == buyer.password);
+
+            if (user == null)
+                return Unauthorized();
+
+            var tokenHandler = new JwtSecurityTokenHandler();
+            var TokenDecriptor = new SecurityTokenDescriptor
+            {
+                Issuer = jwtOptions.Issuer,
+                Audience = jwtOptions.Audiencs,
+                SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtOptions.SiningKey)),
+                SecurityAlgorithms.HmacSha256),
+                Subject = new ClaimsIdentity(new Claim[]
+                {
+                    new (ClaimTypes.NameIdentifier,user.Buyer_ID.ToString()),
+                    new (ClaimTypes.Name,user.Buyer_Name),
+                    new (ClaimTypes.Email,user.Email)
+
+                })
+            };
+            var securityToken = tokenHandler.CreateToken(TokenDecriptor);
+            var accessToken = tokenHandler.WriteToken(securityToken);
+            return Ok(accessToken);
+
+        }
+
+        //===========Dashpord=============
+
+        [HttpPost]
+        [Route("loginDash")]
+        public ActionResult<string> AuthenticatUserDash(AuthenticationRequest request)
+        {
+            var user = dbContext.Set<Seller>().FirstOrDefault(x => x.Email == request.UserEmail &&
+            x.password == request.Password);
+
+            if (user == null)
+                return Unauthorized();
+
+            var tokenHandler = new JwtSecurityTokenHandler();
+            var TokenDecriptor = new SecurityTokenDescriptor
+            {
+                Issuer = jwtOptions.Issuer,
+                Audience = jwtOptions.Audiencs,
+                SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtOptions.SiningKey)),
+                SecurityAlgorithms.HmacSha256),
+                Subject = new ClaimsIdentity(new Claim[]
+                {
+                    new (ClaimTypes.NameIdentifier,user.Seller_ID.ToString()),
+                    new (ClaimTypes.Name,user.seller_Name),
+                    new (ClaimTypes.Email,user.Email)
+
+                })
+            };
+            var securityToken = tokenHandler.CreateToken(TokenDecriptor);
+            var accessToken = tokenHandler.WriteToken(securityToken);
+            return Ok(accessToken);
+        }
+
+
+
+        [HttpPost]
+        [Route("signinDash")]
+        public async Task<IActionResult> AddAuthenticatUserDash(SellerPost seller)
+        {
+            if (!Regex.IsMatch(seller.Email, @"^[a-zA-Z0-9._%+-]+@(gmail\.com|outlook\.com|hotmail\.com|yahoo\.com|icloud\.com|gov|edu|org|net|com)$"))
+                return BadRequest("invalid Email");
+
+            if (!Regex.IsMatch(seller.password, @"^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)[A-Za-z\d]{8,}$"))
+                return BadRequest("invalid password");
+
+            try
+            {
+                using (SqlConnection connection = new SqlConnection(_connectionString))
+                {
+                    await connection.OpenAsync();
+
+                    using (SqlCommand command = new SqlCommand("Sp_AddSellerv4", connection))
+                    {
+                        command.CommandType = CommandType.StoredProcedure;
+
+                        command.Parameters.AddWithValue("@Name", seller.seller_Name);
+                        command.Parameters.AddWithValue("@Email", seller.Email);
+                        command.Parameters.AddWithValue("@Password", seller.password);
+                        command.Parameters.AddWithValue("@Location", seller.Location);
+                        command.Parameters.AddWithValue("@phon", seller.phone);
+                        command.Parameters.AddWithValue("@package", seller.phone);
+
+
+                        await command.ExecuteNonQueryAsync();
+                    }
+                }
+
+
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
+
+
+
+            var user = dbContext.Set<Seller>().FirstOrDefault(x => x.Email == seller.Email &&
+            x.password == seller.password);
+
+            if (user == null)
+                return Unauthorized();
+
+            var tokenHandler = new JwtSecurityTokenHandler();
+            var TokenDecriptor = new SecurityTokenDescriptor
+            {
+                Issuer = jwtOptions.Issuer,
+                Audience = jwtOptions.Audiencs,
+                SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtOptions.SiningKey)),
+                SecurityAlgorithms.HmacSha256),
+                Subject = new ClaimsIdentity(new Claim[]
+                {
+                    new (ClaimTypes.NameIdentifier,user.Seller_ID.ToString()),
+                    new (ClaimTypes.Name,user.seller_Name),
+                    new (ClaimTypes.Email,user.Email)
+
+                })
+            };
+            var securityToken = tokenHandler.CreateToken(TokenDecriptor);
+            var accessToken = tokenHandler.WriteToken(securityToken);
+            return Ok(accessToken);
+
+        }
     }
+
 }

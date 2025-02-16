@@ -10,6 +10,7 @@ namespace SmartE_commerce.Data
         }
         public DbSet<Item> Items { get; set; }
         public DbSet<ItemImage> ItemImages { get; set; }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             //modelBuilder.Entity<ItemImage>()
@@ -24,6 +25,10 @@ namespace SmartE_commerce.Data
            // modelBuilder.Entity<Product>().ToTable("Item").HasKey("Item_ID");
             modelBuilder.Entity<Category>().ToTable("Category").HasKey("Category_ID");
             modelBuilder.Entity<Cart>().ToTable("Cart").HasKey("Item_ID", "Buyer_ID");
+            modelBuilder.Entity<Buyer>().ToTable("Buyer").HasKey("Buyer_ID");
+            modelBuilder.Entity<Seller>().ToTable("Seller").HasKey("Seller_ID");
+
+
 
         }
     }

@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.SqlClient;
 using SmartE_commerce.Data;
 using System.Data;
@@ -7,6 +8,8 @@ namespace SmartE_commerce.Controllers
 {
     [ApiController]
     [Route("Category")]
+    [Authorize]
+
     public class CategoryController : ControllerBase
     {
         private readonly ApplicationDbContext _dbContext;

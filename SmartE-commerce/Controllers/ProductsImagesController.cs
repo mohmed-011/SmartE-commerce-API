@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using SmartE_commerce.Data;
 using SmartE_commerce.Dto;
@@ -7,6 +8,8 @@ namespace SmartE_commerce.Controllers
 {
     [Route("Products")]
     [ApiController]
+    [Authorize]
+
     public class ProductsImagesController : ControllerBase
     {
         private readonly ApplicationDbContext _dbContext;

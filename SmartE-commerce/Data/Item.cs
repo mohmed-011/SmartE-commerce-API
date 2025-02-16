@@ -21,5 +21,7 @@ namespace SmartE_commerce.Data
         public int Sub_Category_ID { get; set; }
         public int? View_Count { get; set; }
         public int? Sold_Count { get; set; }
+        public DateTime? Crate_Date { get; set; }
+
     }
 }

@@ -2,6 +2,7 @@
 using OfficeOpenXml;
 using System.Data;
 using Microsoft.Data.SqlClient;
+using Microsoft.AspNetCore.Authorization;
 
 namespace SmartE_commerce.Controllers
 {
@@ -9,6 +10,8 @@ namespace SmartE_commerce.Controllers
 
     [Route("Excel")]
     [ApiController]
+    [Authorize]
+
     public class ExcelController : ControllerBase
     {
         private readonly string _connectionString = "server=.;database=Smart_EcommerceV4;integrated security =true; trust server certificate = true ";
