@@ -276,7 +276,9 @@ namespace SmartE_commerce.Controllers
             var response = new Dictionary<string, object>(); // كائن رئيسي يحتوي على البيانات والصور
             var productData = new Dictionary<string, object>(); // لتخزين بيانات المنتج
             var imagesData = new Dictionary<string, string>();
-            var BrandData = new Dictionary<string, string>(); // لتخزين الصور
+            var BrandData = new Dictionary<string, string>();
+            var DitailsData = new Dictionary<string, string>(); // لتخزين الصور
+            // لتخزين الصور
             // لتخزين الصور
 
             try
@@ -344,10 +346,33 @@ namespace SmartE_commerce.Controllers
                         }
                     }
 
+                    using (SqlCommand command2 = new SqlCommand("Sp_GetItemDetilas4", connection))
+                    {
+                        command2.CommandType = CommandType.StoredProcedure;
+                        command2.Parameters.AddWithValue("@ItemID", id);
+
+                        using (SqlDataReader reader2 = await command2.ExecuteReaderAsync())
+                        {
+                            
+                            while (await reader2.ReadAsync())
+                            {
+                                for (int i = 0; i < reader2.FieldCount; i++)
+                                {
+                                    DitailsData[reader2.GetName(i)] = reader2.GetValue(i).ToString();
+
+                                }
+                                
+                            }
+                        }
+                    }
+
+
                     // إضافة البيانات والصور إلى كائن الاستجابة النهائي
                     response["Data"] = productData;
                     response["images"] = imagesData;
                     response["Brand"] = BrandData;
+                    response["Detilas"] = DitailsData;
+
 
 
                     return Ok(response);
