@@ -65,6 +65,49 @@ namespace SmartE_commerce.Controllers
         }
 
 
+        [HttpGet]
+        [Route("GetAllSubCategory")]
+        public async Task<IActionResult> GetAllSubCategory()
+        {
+            var resultList = new List<Dictionary<string, object>>();
+
+            try
+            {
+                using (SqlConnection connection = new SqlConnection(_connectionString))
+                {
+                    await connection.OpenAsync();
+
+                    using (SqlCommand command = new SqlCommand("Sp_GetAllSubCategoryv4", connection))
+                    {
+                        command.CommandType = CommandType.StoredProcedure;
+
+                        // Pass parameters to the stored procedure
+
+                        using (SqlDataReader reader = await command.ExecuteReaderAsync())
+                        {
+                            while (await reader.ReadAsync())
+                            {
+                                var row = new Dictionary<string, object>();
+
+                                for (int i = 0; i < reader.FieldCount; i++)
+                                {
+                                    row[reader.GetName(i)] = reader.GetValue(i);
+                                }
+
+                                resultList.Add(row);
+                            }
+                        }
+                    }
+                }
+
+                return Ok(resultList);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
+        }
+
 
         [HttpGet]
         [Route("GetSubCategoryByCategory")]

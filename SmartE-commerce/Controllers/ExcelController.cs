@@ -60,12 +60,12 @@ namespace SmartE_commerce.Controllers
                 @"INSERT INTO Item (
                     Item_ID, Image_Cover, Item_Name, Description, Quantity, 
                     Price_in, Price_out, Discount, Rate, Category_ID, 
-                    Seller_ID, Sub_Category_ID
+                    Seller_ID, Sub_Category_ID , Crate_Date
                 ) 
                 VALUES (
                     @Item_ID, @Image_Cover, @Item_Name, @Description, @Quantity, 
                     @Price_in, @Price_out, @Discount, @Rate, @Category_ID, 
-                    @Seller_ID, @Sub_Category_ID
+                    @Seller_ID, @Sub_Category_ID , @Crate_Date
                 )",
                 connection);
 
@@ -82,23 +82,24 @@ namespace SmartE_commerce.Controllers
                     command.Parameters.AddWithValue("@Category_ID", 1);
                     command.Parameters.AddWithValue("@Seller_ID", Seller_ID);
                     command.Parameters.AddWithValue("@Sub_Category_ID",2);
+                    command.Parameters.AddWithValue("@Crate_Date", DateTime.Now);
+
 
                     await command.ExecuteNonQueryAsync();
 
                     var insertLaptopCommand = new SqlCommand(
                @"INSERT INTO Laptops (
-                    Item_ID, Brand, RAM, Memory, Memory_Type, 
+                    Item_ID, RAM, Memory, Memory_Type, 
                     Graphics_Card, CPU, Weight, Screen_Size, Model
                 ) 
                 VALUES (
-                    @Item_ID, @Brand, @RAM, @Memory, @Memory_Type, 
+                    @Item_ID, @RAM, @Memory, @Memory_Type, 
                     @Graphics_Card, @CPU, @Weight, @Screen_Size, @Model
                 )",
                connection);
 
                     // إعداد المعاملات لجدول Laptops
                     insertLaptopCommand.Parameters.AddWithValue("@Item_ID", "" + Seller_ID + "-" + Item_ID + "");
-                    insertLaptopCommand.Parameters.AddWithValue("@Brand", row["Brand"] != DBNull.Value ? row["Brand"].ToString() : string.Empty);
                     insertLaptopCommand.Parameters.AddWithValue("@RAM", row["RAM"] != DBNull.Value ? Convert.ToInt32(row["RAM"]) : 0);
                     insertLaptopCommand.Parameters.AddWithValue("@Memory", row["Memory"] != DBNull.Value ? Convert.ToInt32(row["Memory"]) : 0);
                     insertLaptopCommand.Parameters.AddWithValue("@Memory_Type", row["Memory_Type"] != DBNull.Value ? row["Memory_Type"].ToString() : string.Empty);
@@ -186,18 +187,17 @@ namespace SmartE_commerce.Controllers
 
                     var insertLaptopCommand = new SqlCommand(
                @"INSERT INTO PCs (
-                    Item_ID, Brand, RAM, Memory, Memory_Type, 
+                    Item_ID, RAM, Memory, Memory_Type, 
                     Graphics_Card, CPU
                 ) 
                 VALUES (
-                    @Item_ID, @Brand, @RAM, @Memory, @Memory_Type, 
+                    @Item_ID, @RAM, @Memory, @Memory_Type, 
                     @Graphics_Card, @CPU
                 )",
                connection);
 
                     // إعداد المعاملات لجدول Laptops
                     insertLaptopCommand.Parameters.AddWithValue("@Item_ID", "" + Seller_ID + "-" + Item_ID + "");
-                    insertLaptopCommand.Parameters.AddWithValue("@Brand", row["Brand"] != DBNull.Value ? row["Brand"].ToString() : string.Empty);
                     insertLaptopCommand.Parameters.AddWithValue("@RAM", row["RAM"] != DBNull.Value ? Convert.ToInt32(row["RAM"]) : 0);
                     insertLaptopCommand.Parameters.AddWithValue("@Memory", row["Memory"] != DBNull.Value ? Convert.ToInt32(row["Memory"]) : 0);
                     insertLaptopCommand.Parameters.AddWithValue("@Memory_Type", row["Memory_Type"] != DBNull.Value ? row["Memory_Type"].ToString() : string.Empty);
@@ -282,18 +282,17 @@ namespace SmartE_commerce.Controllers
 
                     var insertLaptopCommand = new SqlCommand(
                @"INSERT INTO Phones (
-                    Item_ID, Brand, RAM, Memory, 
+                    Item_ID, RAM, Memory, 
                      CPU , Color , Screen_Size
                 ) 
                 VALUES (
-                    @Item_ID, @Brand, @RAM, @Memory,
+                    @Item_ID, @RAM, @Memory,
                      @CPU , @Color , @Screen_Size
                 )",
                connection);
 
                     // إعداد المعاملات لجدول Laptops
                     insertLaptopCommand.Parameters.AddWithValue("@Item_ID", "" + Seller_ID + "-" + Item_ID + "");
-                    insertLaptopCommand.Parameters.AddWithValue("@Brand", row["Brand"] != DBNull.Value ? row["Brand"].ToString() : string.Empty);
                     insertLaptopCommand.Parameters.AddWithValue("@RAM", row["RAM"] != DBNull.Value ? Convert.ToInt32(row["RAM"]) : 0);
                     insertLaptopCommand.Parameters.AddWithValue("@Memory", row["Memory"] != DBNull.Value ? Convert.ToInt32(row["Memory"]) : 0);
                     insertLaptopCommand.Parameters.AddWithValue("@CPU", row["CPU"] != DBNull.Value ? row["CPU"].ToString() : string.Empty);
@@ -379,16 +378,15 @@ namespace SmartE_commerce.Controllers
 
                     var insertLaptopCommand = new SqlCommand(
                @"INSERT INTO Smart_Watches (
-                    Item_ID, Brand ,Model, Screen_Size , OS , Color
+                    Item_ID ,Model, Screen_Size , OS , Color
                 ) 
                 VALUES (
-                    @Item_ID, @Brand ,@Model, @Screen_Size , @OS , @Color
+                    @Item_ID ,@Model, @Screen_Size , @OS , @Color
                 )",
                connection);
 
                     // إعداد المعاملات لجدول Laptops
                     insertLaptopCommand.Parameters.AddWithValue("@Item_ID", "" + Seller_ID + "-" + Item_ID + "");
-                    insertLaptopCommand.Parameters.AddWithValue("@Brand", row["Brand"] != DBNull.Value ? row["Brand"].ToString() : string.Empty);
                     insertLaptopCommand.Parameters.AddWithValue("@Model", row["Model"] != DBNull.Value ? row["Model"].ToString() : DBNull.Value);
                     insertLaptopCommand.Parameters.AddWithValue("@Screen_Size", row["Screen_Size"] != DBNull.Value ? Convert.ToDecimal(row["Screen_Size"]) : DBNull.Value);
                     insertLaptopCommand.Parameters.AddWithValue("@OS", row["OS"] != DBNull.Value ? row["OS"].ToString() : DBNull.Value);
@@ -472,16 +470,15 @@ namespace SmartE_commerce.Controllers
 
                     var insertLaptopCommand = new SqlCommand(
                @"INSERT INTO TVs (
-                    Item_ID, Brand, Screen_Size , Resolution  ,Model
+                    Item_ID, Screen_Size , Resolution  ,Model
                 ) 
                 VALUES (
-                    @Item_ID, @Brand , @Screen_Size , @Resolution ,@Model
+                    @Item_ID , @Screen_Size , @Resolution ,@Model
                 )",
                connection);
 
                     // إعداد المعاملات لجدول Laptops
                     insertLaptopCommand.Parameters.AddWithValue("@Item_ID", "" + Seller_ID + "-" + Item_ID + "");
-                    insertLaptopCommand.Parameters.AddWithValue("@Brand", row["Brand"] != DBNull.Value ? row["Brand"].ToString() : string.Empty);
                     insertLaptopCommand.Parameters.AddWithValue("@Screen_Size", row["Screen_Size"] != DBNull.Value ? Convert.ToDecimal(row["Screen_Size"]) : DBNull.Value);
                     insertLaptopCommand.Parameters.AddWithValue("@Resolution", row["Resolution"] != DBNull.Value ? row["Resolution"].ToString() : string.Empty);
                     insertLaptopCommand.Parameters.AddWithValue("@Model", row["Model"] != DBNull.Value ? row["Model"].ToString() : DBNull.Value);
