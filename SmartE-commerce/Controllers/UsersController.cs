@@ -16,7 +16,7 @@ namespace SmartE_commerce.Controllers
     [Route("Auth")]
     public class UsersController(JwtOptions jwtOptions , ApplicationDbContext dbContext) : ControllerBase
     {
-        private readonly string _connectionString = "server=.;database=Smart_EcommerceV4;integrated security =true; trust server certificate = true ;MultipleActiveResultSets=True ";
+        private readonly string _connectionString = "Server=db14374.databaseasp.net; Database=db14374; User Id=db14374; Password=4Cd_Zo%57!Kn; Encrypt=False; MultipleActiveResultSets=True;";
 
 
         [HttpPost]

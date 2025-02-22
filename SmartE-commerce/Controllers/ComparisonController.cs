@@ -14,11 +14,13 @@ namespace SmartE_commerce.Controllers
     {
 
         private readonly ApplicationDbContext _dbContext;
-        private readonly string _connectionString = "server=.;database=Smart_EcommerceV4;integrated security =true; trust server certificate = true ;MultipleActiveResultSets=True ";
+        private readonly string _connectionString;
 
-        public ComparisonController(ApplicationDbContext dbContext)
+        public ComparisonController(ApplicationDbContext dbContext, IConfiguration configuration)
         {
             _dbContext = dbContext;
+            _connectionString = configuration.GetConnectionString("MyDatabase");
+
         }
 
 

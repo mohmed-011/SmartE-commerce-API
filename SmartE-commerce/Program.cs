@@ -18,7 +18,7 @@ builder.Services.AddSwaggerGen();
 //builder.Services.AddTransient<WitherForcastService>();  // more than ins created
 //builder.Services.AddScoped<IWitherForcastService, WitherForcastService>();     // 1 ins for rquset (defult)
 //builder.Services.AddSingleton<WitherForcastService>();  // 1 ins per program
-builder.Services.AddDbContext<ApplicationDbContext>(builder => builder.UseSqlServer("server=.;database=Smart_EcommerceV4;integrated security =true; trust server certificate = true ;MultipleActiveResultSets=True"));
+builder.Services.AddDbContext<ApplicationDbContext>(builder => builder.UseSqlServer("Server=db14374.databaseasp.net; Database=db14374; User Id=db14374; Password=4Cd_Zo%57!Kn; Encrypt=False; MultipleActiveResultSets=True;"));
 var jwtOptions = builder.Configuration.GetSection("Jwt").Get<JwtOptions>();
 builder.Services.AddSingleton(jwtOptions);
 builder.Services.AddAuthentication()

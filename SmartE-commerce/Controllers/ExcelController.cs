@@ -3,6 +3,8 @@ using OfficeOpenXml;
 using System.Data;
 using Microsoft.Data.SqlClient;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.EntityFrameworkCore;
+using SmartE_commerce.Data;
 
 namespace SmartE_commerce.Controllers
 {
@@ -14,7 +16,11 @@ namespace SmartE_commerce.Controllers
 
     public class ExcelController : ControllerBase
     {
-        private readonly string _connectionString = "server=.;database=Smart_EcommerceV4;integrated security =true; trust server certificate = true ";
+        private readonly string _connectionString;
+        public ExcelController(ApplicationDbContext dbContext, IConfiguration configuration)
+        {
+            _connectionString = configuration.GetConnectionString("MyDatabase");
+        }
 
         [HttpPost("PostLaptops")]
         public async Task<IActionResult> PostLaptops([FromForm] IFormFile file,int SellerId)

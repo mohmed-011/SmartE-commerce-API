@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.SqlClient;
+using Microsoft.Extensions.Configuration;
 using SmartE_commerce.Data;
 using System.Data;
 
@@ -12,14 +13,16 @@ namespace SmartE_commerce.Controllers
     public class BrandsController : ControllerBase
     {
         private readonly ApplicationDbContext _dbContext;
-        private readonly string _connectionString = $"server=.;database=Smart_EcommerceV4;integrated security =true; trust server certificate = true ";
+        private readonly string _connectionString;
 
-        public BrandsController(ApplicationDbContext dbContext)
+        public BrandsController(ApplicationDbContext dbContext, IConfiguration configuration)
         {
             _dbContext = dbContext;
+            _connectionString = configuration.GetConnectionString("MyDatabase");
+
         }
 
-      
+
 
 
         [HttpGet("GetAllBrands")]

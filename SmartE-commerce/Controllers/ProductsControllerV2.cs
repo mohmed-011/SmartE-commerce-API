@@ -18,7 +18,7 @@ namespace SmartE_commerce.Controllers
         public ProductsControllerV2(IWebHostEnvironment environment, ApplicationDbContext dbContext)
         {
             _environment = environment;
-            _dbContext = dbContext;
+            _dbContext = dbContext;           
         }
         [HttpPost]
         [Route("PostProduct")]
