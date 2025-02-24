@@ -44,8 +44,12 @@ namespace SmartE_commerce.Controllers
                         await command.ExecuteNonQueryAsync();
                     }
                 }
+                var response = new Dictionary<string, object>();
+                response["messageToUser"] = $"Item {ItemId} Added successfully to Wishlist.";
 
-                return Ok($"Item {ItemId} Added successfully to Wishlist.");
+                response["message"] = "success";
+
+                return Ok(response);
             }
             catch (Exception ex)
             {
@@ -73,8 +77,13 @@ namespace SmartE_commerce.Controllers
                         await command.ExecuteNonQueryAsync();
                     }
                 }
+                var response = new Dictionary<string, object>();
+                response["messageToUser"] = $"Item {ItemId} Deletet Successfully From Wishlist.";
 
-                return Ok($"Item {ItemId} Deletet successfully to Wishlist.");
+                response["message"] = "success";
+
+                return Ok(response);
+                
             }
             catch (Exception ex)
             {
@@ -103,6 +112,11 @@ namespace SmartE_commerce.Controllers
 
                         using (SqlDataReader reader = await command.ExecuteReaderAsync())
                         {
+                            var Mas = new Dictionary<string, object>();
+
+                            Mas["message"] = "success";
+                            resultList.Add(Mas);
+
                             while (await reader.ReadAsync())
                             {
                                 var row = new Dictionary<string, object>();

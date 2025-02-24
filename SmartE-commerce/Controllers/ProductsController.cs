@@ -100,6 +100,8 @@ namespace SmartE_commerce.Controllers
                     return Ok(new { message = "No items found matching your filters." });
 
                 // 🔹 جلب تفاصيل كل منتج باستخدام `GetProductById`
+                var response = new Dictionary<string, object>();
+
                 var productDetails = new List<object>();
 
                 foreach (var itemId in itemIds)
@@ -110,7 +112,8 @@ namespace SmartE_commerce.Controllers
                         productDetails.Add(okResult.Value);
                     }
                 }
-
+                response["message"] = "success";
+                response["Products"] = productDetails;
                 return Ok(productDetails);
             }
             catch (Exception ex)

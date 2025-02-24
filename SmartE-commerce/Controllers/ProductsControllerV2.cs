@@ -76,7 +76,14 @@ namespace SmartE_commerce.Controllers
                 _dbContext.Items.Add(item);
                 await _dbContext.SaveChangesAsync();
 
-                return Ok(new { message = "Item added successfully!" });
+                var response = new Dictionary<string, object>();
+                response["messageToUser"] = $"Item {item.Item_ID} added Successfully";
+
+                response["message"] = "success";
+
+                return Ok(response);
+
+               
             }
             catch (Exception ex)
             {

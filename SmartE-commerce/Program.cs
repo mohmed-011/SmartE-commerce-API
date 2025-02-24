@@ -18,7 +18,7 @@ builder.Services.AddSwaggerGen();
 //builder.Services.AddTransient<WitherForcastService>();  // more than ins created
 //builder.Services.AddScoped<IWitherForcastService, WitherForcastService>();     // 1 ins for rquset (defult)
 //builder.Services.AddSingleton<WitherForcastService>();  // 1 ins per program
-builder.Services.AddDbContext<ApplicationDbContext>(builder => builder.UseSqlServer("Server=db14374.databaseasp.net; Database=db14374; User Id=db14374; Password=4Cd_Zo%57!Kn; Encrypt=False; MultipleActiveResultSets=True;"));
+builder.Services.AddDbContext<ApplicationDbContext>(builder => builder.UseSqlServer("Server=db14374.public.databaseasp.net; Database=db14374; User Id=db14374; Password=4Cd_Zo%57!Kn; Encrypt=False; MultipleActiveResultSets=True;"));
 var jwtOptions = builder.Configuration.GetSection("Jwt").Get<JwtOptions>();
 builder.Services.AddSingleton(jwtOptions);
 builder.Services.AddAuthentication()
@@ -39,7 +39,18 @@ builder.Services.AddAuthentication()
 
 
     });
-        var app = builder.Build();
+
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowSpecificOrigin", policy =>
+    {
+        policy.AllowAnyOrigin()  
+              .AllowAnyMethod()
+              .AllowAnyHeader();
+    });
+});
+
+var app = builder.Build();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
@@ -47,6 +58,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+app.UseCors("AllowSpecificOrigin");
 app.UseMiddleware<RateLimitingMiddleware>();
 app.UseMiddleware<ProfilingMiddleware>();
 app.UseStaticFiles();

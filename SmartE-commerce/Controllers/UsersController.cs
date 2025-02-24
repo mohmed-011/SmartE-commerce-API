@@ -16,13 +16,17 @@ namespace SmartE_commerce.Controllers
     [Route("Auth")]
     public class UsersController(JwtOptions jwtOptions , ApplicationDbContext dbContext) : ControllerBase
     {
-        private readonly string _connectionString = "Server=db14374.databaseasp.net; Database=db14374; User Id=db14374; Password=4Cd_Zo%57!Kn; Encrypt=False; MultipleActiveResultSets=True;";
+        private readonly string _connectionString = "Server=db14374.public.databaseasp.net; Database=db14374; User Id=db14374; Password=4Cd_Zo%57!Kn; Encrypt=False; MultipleActiveResultSets=True;";
 
 
         [HttpPost]
         [Route("login")]
         public ActionResult<string> AuthenticatUser(AuthenticationRequest request)
         {
+            var response = new Dictionary<string, object>(); 
+            //response["message"] = "success";
+            //response["Token"] = accessToken;
+            //return Ok(response);
             var user = dbContext.Set<Buyer>().FirstOrDefault(x => x.Email == request.UserEmail &&
             x.password == request.Password);
 
@@ -46,7 +50,11 @@ namespace SmartE_commerce.Controllers
             };
             var securityToken = tokenHandler.CreateToken(TokenDecriptor);
             var accessToken = tokenHandler.WriteToken(securityToken);
-            return Ok(accessToken);
+
+             // كائن رئيسي يحتوي على البيانات والصور
+            response["message"] = "success";
+            response["Token"] = accessToken;
+            return Ok(response);
         }
 
 
@@ -63,6 +71,7 @@ namespace SmartE_commerce.Controllers
 
             try
             {
+                                                                 
                 using (SqlConnection connection = new SqlConnection(_connectionString))
                 {
                     await connection.OpenAsync();
@@ -113,7 +122,10 @@ namespace SmartE_commerce.Controllers
             };
             var securityToken = tokenHandler.CreateToken(TokenDecriptor);
             var accessToken = tokenHandler.WriteToken(securityToken);
-            return Ok(accessToken);
+            var response = new Dictionary<string, object>(); // كائن رئيسي يحتوي على البيانات والصور
+            response["message"] = "success";
+            response["Token"] = accessToken;
+            return Ok(response);
 
         }
 
@@ -123,6 +135,8 @@ namespace SmartE_commerce.Controllers
         [Route("loginDash")]
         public ActionResult<string> AuthenticatUserDash(AuthenticationRequest request)
         {
+            var response = new Dictionary<string, object>(); // كائن رئيسي يحتوي على البيانات والصور
+
             var user = dbContext.Set<Seller>().FirstOrDefault(x => x.Email == request.UserEmail &&
             x.password == request.Password);
 
@@ -146,7 +160,11 @@ namespace SmartE_commerce.Controllers
             };
             var securityToken = tokenHandler.CreateToken(TokenDecriptor);
             var accessToken = tokenHandler.WriteToken(securityToken);
-            return Ok(accessToken);
+
+             // كائن رئيسي يحتوي على البيانات والصور
+            response["message"] = "success";
+            response["Token"] = accessToken;
+            return Ok(response);
         }
 
 
@@ -215,7 +233,10 @@ namespace SmartE_commerce.Controllers
             };
             var securityToken = tokenHandler.CreateToken(TokenDecriptor);
             var accessToken = tokenHandler.WriteToken(securityToken);
-            return Ok(accessToken);
+            var response = new Dictionary<string, object>(); // كائن رئيسي يحتوي على البيانات والصور
+            response["message"] = "success";
+            response["Token"] = accessToken;
+            return Ok(response);
 
         }
     }
