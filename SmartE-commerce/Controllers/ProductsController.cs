@@ -399,15 +399,15 @@ namespace SmartE_commerce.Controllers
 
 
 
-        [HttpPost]
-        [Route("InsertProduct")]
-        public  ActionResult<int> CreateProduct(Product product)
-        {
-            product.Item_ID = 0;
-            _dbContext.Set<Product>().Add(product);
-             _dbContext.SaveChanges();
-            return Ok(product.Item_ID);
-        }
+        //[HttpPost]
+        //[Route("InsertProduct")]
+        //public  ActionResult<int> CreateProduct(Product product)
+        //{
+        //    product.Item_ID = 0;
+        //    _dbContext.Set<Product>().Add(product);
+        //     _dbContext.SaveChanges();
+        //    return Ok(product.Item_ID);
+        //}
 
         [HttpPut]
         [Route("UpdateProduct")]
