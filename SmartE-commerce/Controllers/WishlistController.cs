@@ -37,10 +37,6 @@ namespace SmartE_commerce.Controllers
                         command.CommandType = CommandType.StoredProcedure;
                         command.Parameters.AddWithValue("@BuyerID", BuyerId);
                         command.Parameters.AddWithValue("@ItemID", ItemId);
-                        
-
-
-
                         await command.ExecuteNonQueryAsync();
                     }
                 }

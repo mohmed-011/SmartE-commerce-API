@@ -1,8 +1,10 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using SmartE_commerce.Data;
 using SmartE_commerce.Dto;
+using System.Data;
 
 namespace SmartE_commerce.Controllers
 {
@@ -14,11 +16,14 @@ namespace SmartE_commerce.Controllers
     {
         private readonly IWebHostEnvironment _environment;
         private readonly ApplicationDbContext _dbContext;
+        private readonly string _connectionString;
 
-        public ProductsControllerV2(IWebHostEnvironment environment, ApplicationDbContext dbContext)
+        public ProductsControllerV2(IWebHostEnvironment environment, ApplicationDbContext dbContext, IConfiguration configuration)
         {
             _environment = environment;
-            _dbContext = dbContext;           
+            _dbContext = dbContext;        
+            _connectionString = configuration.GetConnectionString("MyDatabase");
+
         }
         [HttpPost]
         [Route("PostProduct")]
@@ -96,7 +101,126 @@ namespace SmartE_commerce.Controllers
             }
         }
 
-        
+
+        [HttpPut]
+        [Route("UpdateProductImage")]
+        public async Task<IActionResult> UpdateProductImage(string ItemId, IFormFile Itemimage)
+        {
+
+            try
+            {
+                string imagePath = "Image_Cover.jpg"; // القيمة الافتراضية
+
+                if (Itemimage != null)
+                {
+                    // 1. توليد اسم فريد للصورة
+                    var fileName = Guid.NewGuid().ToString() + Path.GetExtension(Itemimage.FileName);
+
+                    // 2. مسار الصورة
+                    var uploadsFolder = Path.Combine(_environment.WebRootPath, "uploads");
+                    if (!Directory.Exists(uploadsFolder))
+                    {
+                        Directory.CreateDirectory(uploadsFolder);
+                    }
+                    var filePath = Path.Combine(uploadsFolder, fileName);
+
+                    // 3. حفظ الصورة
+                    using (var fileStream = new FileStream(filePath, FileMode.Create))
+                    {
+                        await Itemimage.CopyToAsync(fileStream);
+                    }
+
+                    // 4. حفظ مسار الصورة
+                    imagePath = $"/uploads/{fileName}";
+                }
+
+                using (SqlConnection connection = new SqlConnection(_connectionString))
+                {
+                    await connection.OpenAsync();
+
+                    using (SqlCommand command = new SqlCommand("Sp_UpdateItemImagecoverv4", connection))
+                    {
+                        command.CommandType = CommandType.StoredProcedure;
+                        command.Parameters.AddWithValue("@ItemID", ItemId);
+                        command.Parameters.AddWithValue("@ImageCover", imagePath);
+                        await command.ExecuteNonQueryAsync();
+                    }
+                }
+                var response = new Dictionary<string, object>();
+                response["messageToUser"] = $"Item {ItemId} Image added Successfully";
+                response["message"] = "success";
+                return Ok(response);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new
+                {
+                    message = "An error occurred while saving the entity changes.",
+                    error = ex.Message,
+                    innerException = ex.InnerException?.Message
+                });
+            }
+        }
+
+        //[HttpPut]
+        //[Route("UpdateProductImageUrl")]
+        //public async Task<IActionResult> UpdateProductImageUrl(string ItemId, string Itemimageurl)
+        //{
+
+        //    try
+        //    {
+        //        string imagePath = "Image_Cover.jpg"; // القيمة الافتراضية
+
+        //        if (Itemimage != null)
+        //        {
+        //            // 1. توليد اسم فريد للصورة
+        //            var fileName = Guid.NewGuid().ToString() + Path.GetExtension(Itemimage.FileName);
+
+        //            // 2. مسار الصورة
+        //            var uploadsFolder = Path.Combine(_environment.WebRootPath, "uploads");
+        //            if (!Directory.Exists(uploadsFolder))
+        //            {
+        //                Directory.CreateDirectory(uploadsFolder);
+        //            }
+        //            var filePath = Path.Combine(uploadsFolder, fileName);
+
+        //            // 3. حفظ الصورة
+        //            using (var fileStream = new FileStream(filePath, FileMode.Create))
+        //            {
+        //                await Itemimage.CopyToAsync(fileStream);
+        //            }
+
+        //            // 4. حفظ مسار الصورة
+        //            imagePath = $"/uploads/{fileName}";
+        //        }
+
+        //        using (SqlConnection connection = new SqlConnection(_connectionString))
+        //        {
+        //            await connection.OpenAsync();
+
+        //            using (SqlCommand command = new SqlCommand("Sp_UpdateItemImagecoverv4", connection))
+        //            {
+        //                command.CommandType = CommandType.StoredProcedure;
+        //                command.Parameters.AddWithValue("@ItemID", ItemId);
+        //                command.Parameters.AddWithValue("@ImageCover", imagePath);
+        //                await command.ExecuteNonQueryAsync();
+        //            }
+        //        }
+        //        var response = new Dictionary<string, object>();
+        //        response["messageToUser"] = $"Item {ItemId} Image added Successfully";
+        //        response["message"] = "success";
+        //        return Ok(response);
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        return StatusCode(500, new
+        //        {
+        //            message = "An error occurred while saving the entity changes.",
+        //            error = ex.Message,
+        //            innerException = ex.InnerException?.Message
+        //        });
+        //    }
+        //}
 
     }
 }

@@ -3,7 +3,9 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using SmartE_commerce.Data;
+using SmartE_commerce.Dto;
 using System.Data;
+using System.Drawing;
 using System.Reflection.PortableExecutable;
 
 namespace SmartE_commerce.Controllers
@@ -31,6 +33,7 @@ namespace SmartE_commerce.Controllers
     [FromQuery] decimal? minPrice,
     [FromQuery] int? categry,
     [FromQuery] int? subCategry,
+    [FromQuery] int? sellerId,
     [FromQuery] decimal? maxPrice,
     [FromQuery] decimal? minRate,
     [FromQuery] decimal? maxRate,
@@ -47,6 +50,9 @@ namespace SmartE_commerce.Controllers
 
                 if (categry.HasValue)
                     query = query.Where(i => i.Category_ID == categry.Value);
+
+                if (sellerId.HasValue)
+                    query = query.Where(i => i.Seller_ID == sellerId.Value);
 
                 if (subCategry.HasValue)
                     query = query.Where(i => i.Sub_Category_ID == subCategry.Value);
@@ -389,8 +395,7 @@ namespace SmartE_commerce.Controllers
         }
 
 
-
-
+        
 
 
 

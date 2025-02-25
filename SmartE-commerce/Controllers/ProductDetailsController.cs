@@ -23,7 +23,7 @@ namespace SmartE_commerce.Controllers
 
 
         [HttpPost("AddPhoneDetails")]
-        public async Task<IActionResult> AddPhoneDetails(PhonePost phone)
+        public async Task<IActionResult> AddPhoneDetails(PhonePost phone,string Item_ID)
         {
             try
             {
@@ -35,7 +35,7 @@ namespace SmartE_commerce.Controllers
                     {
                         command.CommandType = CommandType.StoredProcedure;
 
-                        command.Parameters.AddWithValue("@Item_ID", phone.Item_ID);
+                        command.Parameters.AddWithValue("@Item_ID", Item_ID);
                         command.Parameters.AddWithValue("@RAM", phone.RAM);
                         command.Parameters.AddWithValue("@Memory", phone.Memory);
                         command.Parameters.AddWithValue("@CPU", phone.CPU);
@@ -48,7 +48,7 @@ namespace SmartE_commerce.Controllers
                     }
                 }
                 var response = new Dictionary<string, object>();
-                response["messageToUser"] = $"Item {phone.Item_ID} Details Added successfully.";
+                response["messageToUser"] = $"Item {Item_ID} Details Added successfully.";
                 response["message"] = "success";
                 return Ok(response);
 

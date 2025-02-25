@@ -5,7 +5,6 @@ namespace SmartE_commerce.Data
 {
     public class PhonePost
     {
-        public string Item_ID { get; set; }
         public int RAM { get; set; }
         public int Memory { get; set; }
         public string CPU { get; set; }
