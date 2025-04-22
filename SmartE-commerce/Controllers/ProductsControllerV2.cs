@@ -74,6 +74,7 @@ namespace SmartE_commerce.Controllers
                     Image_Cover = imagePath,
                     View_Count = 0,
                     Sold_Count = 0,
+                    Brand_ID = itemDto.Brand_ID,
                     Crate_Date = DateTime.Now
                     
                 };

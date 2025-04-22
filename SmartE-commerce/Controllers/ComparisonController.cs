@@ -24,6 +24,99 @@ namespace SmartE_commerce.Controllers
         }
 
 
+        [HttpGet("GetAllComparisons")]
+        public async Task<IActionResult> GetAllComparisons(int BuyerId)
+        {
+            try
+            {
+                var tasks = new List<Task<Dictionary<string, object>>>()
+            {
+                GetComparisonData("Sp_GetPhonesComparisonv4", BuyerId),
+                GetComparisonData("Sp_GetLaptopsComparisonv4", BuyerId),
+                GetComparisonData("Sp_GetSmart_WatchesComparisonv4", BuyerId),
+                GetComparisonData("Sp_GetTVsComparisonv4", BuyerId),
+                GetComparisonData("Sp_GetPCsComparisonv4", BuyerId)
+            };
+
+                var results = await Task.WhenAll(tasks);
+
+                return Ok(new
+                {
+                    Phones = results[0],
+                    Laptops = results[1],
+                    SmartWatches = results[2],
+                    TVs = results[3],
+                    PCs = results[4]
+                });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
+        }
+
+        private async Task<Dictionary<string, object>> GetComparisonData(string storedProcedure, int BuyerId)
+        {
+            var resultList = new List<Dictionary<string, object>>();
+
+            using (SqlConnection connection = new SqlConnection(_connectionString))
+            {
+                await connection.OpenAsync();
+                using (SqlCommand command = new SqlCommand(storedProcedure, connection))
+                {
+                    command.CommandType = CommandType.StoredProcedure;
+                    command.Parameters.AddWithValue("@Buyer_ID", BuyerId);
+
+                    using (SqlDataReader reader = await command.ExecuteReaderAsync())
+                    {
+                        while (await reader.ReadAsync())
+                        {
+                            var row = new Dictionary<string, object>();
+                            var imagesData = new Dictionary<string, string>();
+
+                            for (int i = 0; i < reader.FieldCount; i++)
+                            {
+                                row[reader.GetName(i)] = reader.GetValue(i);
+                                if (reader.GetName(i) == "Item_ID")
+                                {
+                                    var itemId = reader.GetValue(i).ToString();
+                                    imagesData = await GetItemImages(connection, itemId);
+                                    row["images"] = imagesData;
+                                }
+                            }
+
+                            resultList.Add(row);
+                        }
+                    }
+                }
+            }
+
+            return new Dictionary<string, object> { { "Data", resultList } };
+        }
+
+        private async Task<Dictionary<string, string>> GetItemImages(SqlConnection connection, string itemId)
+        {
+            var imagesData = new Dictionary<string, string>();
+
+            using (SqlCommand command = new SqlCommand("Sp_GetItemImagesv4", connection))
+            {
+                command.CommandType = CommandType.StoredProcedure;
+                command.Parameters.AddWithValue("@ItemID", itemId);
+
+                using (SqlDataReader reader = await command.ExecuteReaderAsync())
+                {
+                    int j = 1;
+                    while (await reader.ReadAsync())
+                    {
+                        imagesData[$"Item_Images-{j}"] = reader.GetValue(0).ToString();
+                        j++;
+                    }
+                }
+            }
+
+            return imagesData;
+        }
+
 
 
         [HttpGet("GetPhonesComparison")]

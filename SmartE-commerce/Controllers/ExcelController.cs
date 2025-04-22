@@ -23,7 +23,7 @@ namespace SmartE_commerce.Controllers
         }
 
         [HttpPost("PostLaptops")]
-        public async Task<IActionResult> PostLaptops([FromForm] IFormFile file,int SellerId)
+        public async Task<IActionResult> PostLaptops([FromForm] IFormFile file,int SellerId, int BrandID)
         {
             if (file == null || file.Length == 0)
             {
@@ -42,7 +42,7 @@ namespace SmartE_commerce.Controllers
                 var dataTable = ReadExcelFile(filePath);
 
                 // Insert data into database
-                await InsertDataIntoLaptops(dataTable , SellerId);
+                await InsertDataIntoLaptops(dataTable , SellerId , BrandID);
 
                 return Ok("Data imported successfully.");
             }
@@ -51,7 +51,7 @@ namespace SmartE_commerce.Controllers
                 return StatusCode(500, $"Internal server error: {ex.Message}");
             }
         }
-        private async Task InsertDataIntoLaptops(DataTable dataTable , int SellerId)
+        private async Task InsertDataIntoLaptops(DataTable dataTable , int SellerId , int BrandID)
         {
             using (var connection = new SqlConnection(_connectionString))
             {
@@ -66,12 +66,12 @@ namespace SmartE_commerce.Controllers
                 @"INSERT INTO Item (
                     Item_ID, Image_Cover, Item_Name, Description, Quantity, 
                     Price_in, Price_out, Discount, Rate, Category_ID, 
-                    Seller_ID, Sub_Category_ID , Crate_Date
+                    Seller_ID, Sub_Category_ID ,Brand_ID, Crate_Date
                 ) 
                 VALUES (
                     @Item_ID, @Image_Cover, @Item_Name, @Description, @Quantity, 
                     @Price_in, @Price_out, @Discount, @Rate, @Category_ID, 
-                    @Seller_ID, @Sub_Category_ID , @Crate_Date
+                    @Seller_ID, @Sub_Category_ID ,@Brand_ID, @Crate_Date
                 )",
                 connection);
 
@@ -88,6 +88,7 @@ namespace SmartE_commerce.Controllers
                     command.Parameters.AddWithValue("@Category_ID", 1);
                     command.Parameters.AddWithValue("@Seller_ID", Seller_ID);
                     command.Parameters.AddWithValue("@Sub_Category_ID",2);
+                    command.Parameters.AddWithValue("@Brand_ID", BrandID);
                     command.Parameters.AddWithValue("@Crate_Date", DateTime.Now);
 
 
@@ -123,7 +124,7 @@ namespace SmartE_commerce.Controllers
 
 
         [HttpPost("PostPCs")]
-        public async Task<IActionResult> PostPCs([FromForm] IFormFile file, int SellerId)
+        public async Task<IActionResult> PostPCs([FromForm] IFormFile file, int SellerId, int BrandID)
         {
             if (file == null || file.Length == 0)
             {
@@ -142,7 +143,7 @@ namespace SmartE_commerce.Controllers
                 var dataTable = ReadExcelFile(filePath);
 
                 // Insert data into database
-                await InsertDataIntoPCs(dataTable, SellerId);
+                await InsertDataIntoPCs(dataTable, SellerId, BrandID);
 
                 return Ok("Data imported successfully.");
             }
@@ -151,7 +152,7 @@ namespace SmartE_commerce.Controllers
                 return StatusCode(500, $"Internal server error: {ex.Message}");
             }
         }
-        private async Task InsertDataIntoPCs(DataTable dataTable, int SellerId)
+        private async Task InsertDataIntoPCs(DataTable dataTable, int SellerId, int BrandID)
         {
             using (var connection = new SqlConnection(_connectionString))
             {
@@ -166,12 +167,12 @@ namespace SmartE_commerce.Controllers
                 @"INSERT INTO Item (
                     Item_ID, Image_Cover, Item_Name, Description, Quantity, 
                     Price_in, Price_out, Discount, Rate, Category_ID, 
-                    Seller_ID, Sub_Category_ID
+                    Seller_ID, Sub_Category_ID ,Brand_ID, Crate_Date
                 ) 
                 VALUES (
                     @Item_ID, @Image_Cover, @Item_Name, @Description, @Quantity, 
                     @Price_in, @Price_out, @Discount, @Rate, @Category_ID, 
-                    @Seller_ID, @Sub_Category_ID
+                    @Seller_ID, @Sub_Category_ID ,@Brand_ID, @Crate_Date
                 )",
                 connection);
 
@@ -188,6 +189,8 @@ namespace SmartE_commerce.Controllers
                     command.Parameters.AddWithValue("@Category_ID", 1);
                     command.Parameters.AddWithValue("@Seller_ID", Seller_ID);
                     command.Parameters.AddWithValue("@Sub_Category_ID", 19);
+                    command.Parameters.AddWithValue("@Brand_ID", BrandID);
+                    command.Parameters.AddWithValue("@Crate_Date", DateTime.Now);
 
                     await command.ExecuteNonQueryAsync();
 
@@ -218,7 +221,7 @@ namespace SmartE_commerce.Controllers
 
 
         [HttpPost("PostPhones")]
-        public async Task<IActionResult> PostPhones([FromForm] IFormFile file, int SellerId)
+        public async Task<IActionResult> PostPhones([FromForm] IFormFile file, int SellerId, int BrandID)
         {
             if (file == null || file.Length == 0)
             {
@@ -237,7 +240,7 @@ namespace SmartE_commerce.Controllers
                 var dataTable = ReadExcelFile(filePath);
 
                 // Insert data into database
-                await InsertDataIntoPhones(dataTable, SellerId);
+                await InsertDataIntoPhones(dataTable, SellerId, BrandID);
 
                 return Ok("Data imported successfully.");
             }
@@ -246,7 +249,7 @@ namespace SmartE_commerce.Controllers
                 return StatusCode(500, $"Internal server error: {ex.Message}");
             }
         }
-        private async Task InsertDataIntoPhones(DataTable dataTable, int SellerId)
+        private async Task InsertDataIntoPhones(DataTable dataTable, int SellerId, int BrandID)
         {
             using (var connection = new SqlConnection(_connectionString))
             {
@@ -261,12 +264,12 @@ namespace SmartE_commerce.Controllers
                 @"INSERT INTO Item (
                     Item_ID, Image_Cover, Item_Name, Description, Quantity, 
                     Price_in, Price_out, Discount, Rate, Category_ID, 
-                    Seller_ID, Sub_Category_ID
+                    Seller_ID, Sub_Category_ID ,Brand_ID, Crate_Date
                 ) 
                 VALUES (
                     @Item_ID, @Image_Cover, @Item_Name, @Description, @Quantity, 
                     @Price_in, @Price_out, @Discount, @Rate, @Category_ID, 
-                    @Seller_ID, @Sub_Category_ID
+                    @Seller_ID, @Sub_Category_ID ,@Brand_ID, @Crate_Date
                 )",
                 connection);
 
@@ -283,6 +286,8 @@ namespace SmartE_commerce.Controllers
                     command.Parameters.AddWithValue("@Category_ID", 1);
                     command.Parameters.AddWithValue("@Seller_ID", Seller_ID);
                     command.Parameters.AddWithValue("@Sub_Category_ID", 1);
+                    command.Parameters.AddWithValue("@Brand_ID", BrandID);
+                    command.Parameters.AddWithValue("@Crate_Date", DateTime.Now);
 
                     await command.ExecuteNonQueryAsync();
 
@@ -314,7 +319,7 @@ namespace SmartE_commerce.Controllers
 
 
         [HttpPost("PostSmartWatches")]
-        public async Task<IActionResult> PostSmartWatches([FromForm] IFormFile file, int SellerId)
+        public async Task<IActionResult> PostSmartWatches([FromForm] IFormFile file, int SellerId, int BrandID)
         {
             if (file == null || file.Length == 0)
             {
@@ -333,7 +338,7 @@ namespace SmartE_commerce.Controllers
                 var dataTable = ReadExcelFile(filePath);
 
                 // Insert data into database
-                await InsertDataIntoSmartWatches(dataTable, SellerId);
+                await InsertDataIntoSmartWatches(dataTable, SellerId, BrandID);
 
                 return Ok("Data imported successfully.");
             }
@@ -342,7 +347,7 @@ namespace SmartE_commerce.Controllers
                 return StatusCode(500, $"Internal server error: {ex.Message}");
             }
         }
-        private async Task InsertDataIntoSmartWatches(DataTable dataTable, int SellerId)
+        private async Task InsertDataIntoSmartWatches(DataTable dataTable, int SellerId, int BrandID)
         {
             using (var connection = new SqlConnection(_connectionString))
             {
@@ -357,12 +362,12 @@ namespace SmartE_commerce.Controllers
                 @"INSERT INTO Item (
                     Item_ID, Image_Cover, Item_Name, Description, Quantity, 
                     Price_in, Price_out, Discount, Rate, Category_ID, 
-                    Seller_ID, Sub_Category_ID
+                    Seller_ID, Sub_Category_ID ,Brand_ID, Crate_Date
                 ) 
                 VALUES (
                     @Item_ID, @Image_Cover, @Item_Name, @Description, @Quantity, 
                     @Price_in, @Price_out, @Discount, @Rate, @Category_ID, 
-                    @Seller_ID, @Sub_Category_ID
+                    @Seller_ID, @Sub_Category_ID ,@Brand_ID, @Crate_Date
                 )",
                 connection);
 
@@ -379,6 +384,8 @@ namespace SmartE_commerce.Controllers
                     command.Parameters.AddWithValue("@Category_ID", 1);
                     command.Parameters.AddWithValue("@Seller_ID", Seller_ID);
                     command.Parameters.AddWithValue("@Sub_Category_ID", 4);
+                    command.Parameters.AddWithValue("@Brand_ID", BrandID);
+                    command.Parameters.AddWithValue("@Crate_Date", DateTime.Now);
 
                     await command.ExecuteNonQueryAsync();
 
@@ -406,7 +413,7 @@ namespace SmartE_commerce.Controllers
 
 
         [HttpPost("PostTVs")]
-        public async Task<IActionResult> PostTVs([FromForm] IFormFile file, int SellerId)
+        public async Task<IActionResult> PostTVs([FromForm] IFormFile file, int SellerId, int BrandID)
         {
             if (file == null || file.Length == 0)
             {
@@ -425,7 +432,7 @@ namespace SmartE_commerce.Controllers
                 var dataTable = ReadExcelFile(filePath);
 
                 // Insert data into database
-                await InsertDataIntoTVs(dataTable, SellerId);
+                await InsertDataIntoTVs(dataTable, SellerId, BrandID);
 
                 return Ok("Data imported successfully.");
             }
@@ -434,7 +441,7 @@ namespace SmartE_commerce.Controllers
                 return StatusCode(500, $"Internal server error: {ex.Message}");
             }
         }
-        private async Task InsertDataIntoTVs(DataTable dataTable, int SellerId)
+        private async Task InsertDataIntoTVs(DataTable dataTable, int SellerId, int BrandID)
         {
             using (var connection = new SqlConnection(_connectionString))
             {
@@ -449,12 +456,12 @@ namespace SmartE_commerce.Controllers
                 @"INSERT INTO Item (
                     Item_ID, Image_Cover, Item_Name, Description, Quantity, 
                     Price_in, Price_out, Discount, Rate, Category_ID, 
-                    Seller_ID, Sub_Category_ID
+                    Seller_ID, Sub_Category_ID ,Brand_ID, Crate_Date
                 ) 
                 VALUES (
                     @Item_ID, @Image_Cover, @Item_Name, @Description, @Quantity, 
                     @Price_in, @Price_out, @Discount, @Rate, @Category_ID, 
-                    @Seller_ID, @Sub_Category_ID
+                    @Seller_ID, @Sub_Category_ID ,@Brand_ID, @Crate_Date
                 )",
                 connection);
 
@@ -471,6 +478,8 @@ namespace SmartE_commerce.Controllers
                     command.Parameters.AddWithValue("@Category_ID", 2);
                     command.Parameters.AddWithValue("@Seller_ID", Seller_ID);
                     command.Parameters.AddWithValue("@Sub_Category_ID", 7);
+                    command.Parameters.AddWithValue("@Brand_ID", BrandID);
+                    command.Parameters.AddWithValue("@Crate_Date", DateTime.Now);
 
                     await command.ExecuteNonQueryAsync();
 
@@ -499,7 +508,7 @@ namespace SmartE_commerce.Controllers
 
 
         [HttpPost("PostItems")]
-        public async Task<IActionResult> PostItem([FromForm] IFormFile file, int SellerId , int CategoryId , int SubCategoryId)
+        public async Task<IActionResult> PostItem([FromForm] IFormFile file, int SellerId , int CategoryId , int SubCategoryId, int BrandID)
         {
             if (file == null || file.Length == 0)
             {
@@ -518,7 +527,7 @@ namespace SmartE_commerce.Controllers
                 var dataTable = ReadExcelFile(filePath);
 
                 // Insert data into database
-                await InsertDataIntoItem(dataTable, SellerId,CategoryId,SubCategoryId);
+                await InsertDataIntoItem(dataTable, SellerId,CategoryId,SubCategoryId, BrandID);
 
                 return Ok("Data imported successfully.");
             }
@@ -527,7 +536,7 @@ namespace SmartE_commerce.Controllers
                 return StatusCode(500, $"Internal server error: {ex.Message}");
             }
         }
-        private async Task InsertDataIntoItem(DataTable dataTable, int SellerId , int CategoryId, int SubCategoryId)
+        private async Task InsertDataIntoItem(DataTable dataTable, int SellerId , int CategoryId, int SubCategoryId, int BrandID)
         {
             using (var connection = new SqlConnection(_connectionString))
             {
@@ -542,12 +551,12 @@ namespace SmartE_commerce.Controllers
                 @"INSERT INTO Item (
                     Item_ID, Image_Cover, Item_Name, Description, Quantity, 
                     Price_in, Price_out, Discount, Rate, Category_ID, 
-                    Seller_ID, Sub_Category_ID
+                    Seller_ID, Sub_Category_ID ,Brand_ID, Crate_Date
                 ) 
                 VALUES (
                     @Item_ID, @Image_Cover, @Item_Name, @Description, @Quantity, 
                     @Price_in, @Price_out, @Discount, @Rate, @Category_ID, 
-                    @Seller_ID, @Sub_Category_ID
+                    @Seller_ID, @Sub_Category_ID ,@Brand_ID, @Crate_Date
                 )",
                 connection);
 
@@ -564,6 +573,8 @@ namespace SmartE_commerce.Controllers
                     command.Parameters.AddWithValue("@Category_ID", CategoryId);
                     command.Parameters.AddWithValue("@Seller_ID", Seller_ID);
                     command.Parameters.AddWithValue("@Sub_Category_ID", SubCategoryId);
+                    command.Parameters.AddWithValue("@Brand_ID", BrandID);
+                    command.Parameters.AddWithValue("@Crate_Date", DateTime.Now);
 
                     await command.ExecuteNonQueryAsync();
                 }

@@ -40,12 +40,12 @@ namespace SmartE_commerce.Controllers
     [FromQuery] bool? mostViewed,
     [FromQuery] bool? mostSold,
     [FromQuery] bool? newwest,
-
-    [FromQuery] string? searchQuery)
+    [FromQuery] string? searchQuery,
+    [FromQuery] int pageNumber = 1,
+    [FromQuery] int pageSize = 10)
         {
             try
             {
-                
                 var query = _dbContext.Items.AsQueryable();
 
                 if (categry.HasValue)
@@ -57,29 +57,24 @@ namespace SmartE_commerce.Controllers
                 if (subCategry.HasValue)
                     query = query.Where(i => i.Sub_Category_ID == subCategry.Value);
 
-                // 🔹 الفلترة حسب السعر
                 if (minPrice.HasValue)
                     query = query.Where(i => i.Price_out >= minPrice.Value);
 
                 if (maxPrice.HasValue)
                     query = query.Where(i => i.Price_out <= maxPrice.Value);
 
-                // 🔹 الفلترة حسب التقييم
                 if (minRate.HasValue)
                     query = query.Where(i => i.Rate >= minRate.Value);
 
                 if (maxRate.HasValue)
                     query = query.Where(i => i.Rate <= maxRate.Value);
 
-                // 🔹 البحث بالاسم أو الوصف
                 if (!string.IsNullOrWhiteSpace(searchQuery))
                     query = query.Where(i => i.Item_Name.Contains(searchQuery) || i.Description.Contains(searchQuery));
 
-                // 🔹 ترتيب النتائج
                 if (mostViewed.HasValue && mostViewed.Value && mostSold.HasValue && mostSold.Value)
                 {
-                    query = query.OrderByDescending(i => i.View_Count)
-                                 .ThenByDescending(i => i.Sold_Count);
+                    query = query.OrderByDescending(i => i.View_Count).ThenByDescending(i => i.Sold_Count);
                 }
                 else if (mostViewed.HasValue && mostViewed.Value)
                 {
@@ -95,32 +90,34 @@ namespace SmartE_commerce.Controllers
                 }
                 else
                 {
-                    // 🔹 إذا لم يتم اختيار ترتيب معين، ترتيب افتراضي حسب التقييم
                     query = query.OrderByDescending(i => i.Rate);
                 }
 
-                // 🔹 جلب قائمة الـ Item_IDs
-                var itemIds = await query.Select(i => i.Item_ID).ToListAsync();
+                int totalItems = await query.CountAsync();
+                var totalPages = (int)Math.Ceiling(totalItems / (double)pageSize);
 
-                if (!itemIds.Any())
+                var items = await query.Skip((pageNumber - 1) * pageSize).Take(pageSize).ToListAsync();
+
+                if (!items.Any())
                     return Ok(new { message = "No items found matching your filters." });
 
-                // 🔹 جلب تفاصيل كل منتج باستخدام `GetProductById`
-                var response = new Dictionary<string, object>();
-
-                var productDetails = new List<object>();
-
-                foreach (var itemId in itemIds)
+                var productDetails = await Task.WhenAll(items.Select(async item =>
                 {
-                    var productResult = await GetProductById(itemId);
-                    if (productResult is OkObjectResult okResult)
-                    {
-                        productDetails.Add(okResult.Value);
-                    }
-                }
-                response["message"] = "success";
-                response["Products"] = productDetails;
-                return Ok(productDetails);
+                    var productResult = await GetProductById(item.Item_ID);
+                    return productResult is OkObjectResult okResult ? okResult.Value : null;
+                }));
+
+                var response = new
+                {
+                    message = "success",
+                    PageNumber = pageNumber,
+                    PageSize = pageSize,
+                    TotalPages = totalPages,
+                    TotalItems = totalItems,
+                    Products = productDetails.Where(p => p != null)
+                };
+
+                return Ok(response);
             }
             catch (Exception ex)
             {
@@ -132,6 +129,8 @@ namespace SmartE_commerce.Controllers
                 });
             }
         }
+
+
 
 
         //[HttpGet]

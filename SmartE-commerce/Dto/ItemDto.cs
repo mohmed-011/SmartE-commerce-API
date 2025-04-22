@@ -16,6 +16,7 @@
         public IFormFile? Image { get; set; }
         public int? View_Count { get; set; }
         public int? Sold_Count { get; set; }
+        public int? Brand_ID { get; set; }
         public DateTime? Crate_Date { get; set; }
 
     }

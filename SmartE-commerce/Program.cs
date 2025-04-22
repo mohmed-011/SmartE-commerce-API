@@ -5,6 +5,7 @@ using Microsoft.IdentityModel.Tokens;
 using SmartE_commerce.Classes;
 using SmartE_commerce.Data;
 using SmartE_commerce.MiddleWares;
+using SmartE_commerce.Services;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -20,6 +21,9 @@ builder.Services.AddSwaggerGen();
 //builder.Services.AddSingleton<WitherForcastService>();  // 1 ins per program
 builder.Services.AddDbContext<ApplicationDbContext>(builder => builder.UseSqlServer("Server=db14374.public.databaseasp.net; Database=db14374; User Id=db14374; Password=4Cd_Zo%57!Kn; Encrypt=False; MultipleActiveResultSets=True;"));
 var jwtOptions = builder.Configuration.GetSection("Jwt").Get<JwtOptions>();
+builder.Services.AddHttpClient<PaymobService>();
+builder.Services.AddScoped<CartService>();
+
 builder.Services.AddSingleton(jwtOptions);
 builder.Services.AddAuthentication()
     .AddJwtBearer(JwtBearerDefaults.AuthenticationScheme, option =>
@@ -59,7 +63,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 app.UseCors("AllowSpecificOrigin");
-app.UseMiddleware<RateLimitingMiddleware>();
+//app.UseMiddleware<RateLimitingMiddleware>();
 app.UseMiddleware<ProfilingMiddleware>();
 app.UseStaticFiles();
 app.UseHttpsRedirection();
