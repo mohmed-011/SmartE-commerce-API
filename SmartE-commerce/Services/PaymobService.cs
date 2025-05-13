@@ -28,8 +28,6 @@ namespace SmartE_commerce.Services
                 api_key = _apiKey
             });
 
-            var UserItems = await _httpClient.GetAsync("https://sm-ecommerce.runasp.net/Cart/GetUserCart?UserId=1");
-            Console.WriteLine(UserItems);
 
 
             var json = await response.Content.ReadAsStringAsync();
@@ -43,7 +41,6 @@ namespace SmartE_commerce.Services
 
             var httpClient = new HttpClient();
             var cartService = new CartService(httpClient);
-
             var cartItems = await cartService.GetUserCartAsync(userId);
 
             
@@ -69,7 +66,7 @@ namespace SmartE_commerce.Services
             return orderId;
         }
 
-        public async Task<string> GetPaymentKey(string token, int orderId , BillingData billingData , int integrationId , int userId)
+        public async Task<string> GetPaymentKey(string token, int orderId , BillingData billingData , int integrationId , int userId, int addressID)
         {
             
 
@@ -97,7 +94,7 @@ namespace SmartE_commerce.Services
                 },
                 currency = "EGP",
                 integration_id = integrationId,
-                redirect_url = $"https://localhost:7221/api/Payment/payment-redirect?userId={userId}"
+                redirect_url = $"https://sm-ecommerce.runasp.net/api/Payment/payment-redirect?userId={userId}&addressID={addressID}"
             });
             //https://localhost:7221/
             //https://sm-ecommerce.runasp.net/

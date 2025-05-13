@@ -10,7 +10,6 @@ namespace SmartE_commerce.Data
         public string Email   { get; set; }
         public string phone   { get; set; }
         public string password  { get; set; } 
-        public string Location   { get; set; }
 	    public string Buyer_Image   { get; set; }
     }
 
@@ -20,6 +19,5 @@ namespace SmartE_commerce.Data
         public string Email { get; set; }
         public string phone { get; set; }
         public string password { get; set; }
-        public string Location { get; set; }
     }
 }

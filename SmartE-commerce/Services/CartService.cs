@@ -18,7 +18,7 @@ public class CartService
     {
         try
         {
-            string url = $"http://sm-ecommerce.runasp.net/Cart/GetUserCart?UserId={userId}";
+            string url = $"https://sm-ecommerce.runasp.net/Cart/GetUserCart?UserId={userId}";
 
             HttpResponseMessage response = await _httpClient.GetAsync(url);
 

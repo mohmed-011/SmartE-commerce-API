@@ -24,6 +24,62 @@ namespace SmartE_commerce.Controllers
         }
 
 
+        [HttpGet("GetTwoItemsComp")]
+        public async Task<IActionResult> GetTwoItemsComp(string id1 , string id2)
+        {
+            var ordersList = new List<Dictionary<string, object>>();
+
+            try
+            {
+                using (SqlConnection connection = new SqlConnection(_connectionString))
+                {
+                    await connection.OpenAsync();
+
+                    using (SqlCommand command = new SqlCommand("Sp_GetTwoItemsMonthlySalesDetails", connection))
+                    {
+                        command.CommandType = CommandType.StoredProcedure;
+                        command.Parameters.AddWithValue("@ItemOneID", id1);
+                        command.Parameters.AddWithValue("@ItemTwoID", id2);
+
+
+                        using (SqlDataReader reader = await command.ExecuteReaderAsync())
+                        {
+                            while (await reader.ReadAsync())
+                            {
+                                var row = new Dictionary<string, object>();
+
+                                for (int i = 0; i < reader.FieldCount; i++)
+                                {
+                                    row[reader.GetName(i)] = reader.GetValue(i);
+                                }
+
+                                ordersList.Add(row);
+                            }
+                        }
+                    }
+                }
+
+                var response = new
+                {
+                    message = "success",
+                    data = ordersList
+                };
+
+                return Ok(response);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
+        }
+
+
+
+
+
+
+
+
         [HttpGet("GetAllComparisons")]
         public async Task<IActionResult> GetAllComparisons(int BuyerId)
         {

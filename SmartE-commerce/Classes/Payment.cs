@@ -10,6 +10,8 @@
         public string PaymentMethod { get; set; }
         public DateTime PaymentDate { get; set; }
         public int UserId { get; set; }
+        public int AddressID { get; set; }
+
 
         // Optional: لو عايز تخزن الريسبونس الخام
         public string RawResponse { get; set; }

@@ -83,7 +83,6 @@ namespace SmartE_commerce.Controllers
                         command.Parameters.AddWithValue("@Name", buyer.Buyer_Name);
                         command.Parameters.AddWithValue("@Email", buyer.Email);
                         command.Parameters.AddWithValue("@Password", buyer.password);
-                        command.Parameters.AddWithValue("@Location", buyer.Location);
                         command.Parameters.AddWithValue("@phon", buyer.phone);
 
                         await command.ExecuteNonQueryAsync();
