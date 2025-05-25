@@ -20,6 +20,53 @@ namespace SmartE_commerce.Controllers
         }
 
 
+        [HttpGet("GetSellerOrders")]
+        public async Task<IActionResult> GetSellerOrders(int saller)
+        {
+            var ordersList = new List<Dictionary<string, object>>();
+
+            try
+            {
+                using (SqlConnection connection = new SqlConnection(_connectionString))
+                {
+                    await connection.OpenAsync();
+
+                    using (SqlCommand command = new SqlCommand("SP_GetSellerOrders", connection))
+                    {
+                        command.CommandType = CommandType.StoredProcedure;
+                        command.Parameters.AddWithValue("@Seller_ID", saller);
+
+                        using (SqlDataReader reader = await command.ExecuteReaderAsync())
+                        {
+                            while (await reader.ReadAsync())
+                            {
+                                var row = new Dictionary<string, object>();
+
+                                for (int i = 0; i < reader.FieldCount; i++)
+                                {
+                                    row[reader.GetName(i)] = reader.GetValue(i);
+                                }
+
+                                ordersList.Add(row);
+                            }
+                        }
+                    }
+                }
+
+                var response = new
+                {
+                    message = "success",
+                    data = ordersList
+                };
+
+                return Ok(response);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
+        }
+
 
 
         [HttpGet("GetUserOrders")]

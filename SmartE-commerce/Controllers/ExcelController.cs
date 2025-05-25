@@ -583,11 +583,6 @@ namespace SmartE_commerce.Controllers
 
 
 
-
-
-
-
-
         private DataTable ReadExcelFile(string filePath)
         {
             var dataTable = new DataTable();
