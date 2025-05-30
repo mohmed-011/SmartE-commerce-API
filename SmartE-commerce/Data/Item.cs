@@ -22,8 +22,24 @@ namespace SmartE_commerce.Data
         public int? View_Count { get; set; }
         public int? Sold_Count { get; set; }
         public int? Brand_ID { get; set; }
-
+        public bool SoftDelete { get; set; } = false;
         public DateTime? Crate_Date { get; set; }
 
+    }
+
+    public class ItemUpdateDto
+    {
+        public string Item_ID { get; set; }
+        public string? Image_Cover { get; set; }
+        public string Item_Name { get; set; }
+        public string Description { get; set; }
+        public int Quantity { get; set; }
+        public decimal Price_in { get; set; }
+        public decimal Price_out { get; set; }
+        public decimal? Discount { get; set; }
+        public int Category_ID { get; set; }
+        public int Sub_Category_ID { get; set; }
+        public int? Brand_ID { get; set; }
+        public DateTime? Crate_Date { get; set; }
     }
 }

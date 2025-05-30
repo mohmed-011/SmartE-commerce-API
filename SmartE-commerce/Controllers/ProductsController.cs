@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using SmartE_commerce.Data;
 using SmartE_commerce.Dto;
 using System.Data;
@@ -47,6 +48,8 @@ namespace SmartE_commerce.Controllers
             try
             {
                 var query = _dbContext.Items.AsQueryable();
+
+                query = query.Where(i => !i.SoftDelete);
 
                 if (categry.HasValue)
                     query = query.Where(i => i.Category_ID == categry.Value);
@@ -394,8 +397,38 @@ namespace SmartE_commerce.Controllers
         }
 
 
-        
 
+        [HttpDelete("DeleteProductById")]
+        public async Task<IActionResult> EmptyCart(string ItemID)
+        {
+            try
+            {
+                using (SqlConnection connection = new SqlConnection(_connectionString))
+                {
+                    await connection.OpenAsync();
+
+                    using (SqlCommand command = new SqlCommand("Sp_DeleteItemv4", connection))
+                    {
+                        command.CommandType = CommandType.StoredProcedure;
+                        command.Parameters.AddWithValue("@ItemID", ItemID);
+
+                        await command.ExecuteNonQueryAsync();
+                    }
+                }
+
+                var response = new
+                {
+                    message = "success",
+                    
+                };
+
+                return Ok(response);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
+        }
 
 
 
@@ -413,45 +446,46 @@ namespace SmartE_commerce.Controllers
         //    return Ok(product.Item_ID);
         //}
 
-        [HttpPut]
-        [Route("UpdateProduct")]
-        public async Task<IActionResult> UpdateItem(string id, [FromBody] Item updatedItem)
+        [HttpPut("update")]
+        public async Task<IActionResult> UpdateItem([FromBody] ItemUpdateDto updatedItem)
         {
-            if (id != updatedItem.Item_ID)
+            using (var connection = new SqlConnection(_connectionString))
             {
-                return BadRequest(new { message = "Item ID mismatch." });
-            }
+                using (var command = new SqlCommand("UpdateItem", connection))
+                {
+                    command.CommandType = CommandType.StoredProcedure;
 
-            var existingItem = await _dbContext.Items.FindAsync(id);
-            if (existingItem == null)
-            {
-                return NotFound(new { message = "Item not found." });
-            }
+                    command.Parameters.AddWithValue("@Item_ID", updatedItem.Item_ID ?? (object)DBNull.Value);
+                    command.Parameters.AddWithValue("@Image_Cover", updatedItem.Image_Cover ?? (object)DBNull.Value);
+                    command.Parameters.AddWithValue("@Item_Name", updatedItem.Item_Name ?? (object)DBNull.Value);
+                    command.Parameters.AddWithValue("@Description", updatedItem.Description ?? (object)DBNull.Value);
+                    command.Parameters.AddWithValue("@Quantity", updatedItem.Quantity);
+                    command.Parameters.AddWithValue("@Price_in", updatedItem.Price_in);
+                    command.Parameters.AddWithValue("@Price_out", updatedItem.Price_out);
+                    command.Parameters.AddWithValue("@Discount", updatedItem.Discount);
+                    command.Parameters.AddWithValue("@Category_ID", updatedItem.Category_ID);
+                    command.Parameters.AddWithValue("@Sub_Category_ID", updatedItem.Sub_Category_ID);
+                    command.Parameters.AddWithValue("@Brand_ID", updatedItem.Brand_ID);
+                    command.Parameters.AddWithValue("@Crate_Date", updatedItem.Crate_Date);
 
-            // Update fields
-            existingItem.Item_Name = updatedItem.Item_Name;
-            existingItem.Description = updatedItem.Description;
-            existingItem.Quantity = updatedItem.Quantity;
-            existingItem.Price_in = updatedItem.Price_in;
-            existingItem.Price_out = updatedItem.Price_out;
-            existingItem.Discount = updatedItem.Discount;
-            existingItem.Rate = updatedItem.Rate;
-            existingItem.Category_ID = updatedItem.Category_ID;
-            existingItem.Seller_ID = updatedItem.Seller_ID;
-            existingItem.Sub_Category_ID = updatedItem.Sub_Category_ID;
-
-            // Save changes
-            try
-            {
-                await _dbContext.SaveChangesAsync();
+                    try
+                    {
+                        await connection.OpenAsync();
+                        await command.ExecuteNonQueryAsync();
+                        return Ok(
+                            new {
+                                message = "success" ,
+                                display = "Item updated successfully via stored procedure."
+                            });
+                    }
+                    catch (Exception ex)
+                    {
+                        return StatusCode(500, $"Internal server error: {ex.Message}");
+                    }
+                }
             }
-            catch (DbUpdateException ex)
-            {
-                return StatusCode(500, new { message = "An error occurred while updating the item.", error = ex.Message });
-            }
-
-            return Ok(new { message = "Item updated successfully." });
         }
+
         //public ActionResult UpdateProduct(Product product)
         //{
         //    var existingProduct = _dbContext.Set<Product>().Find(product.Item_ID);
@@ -482,20 +516,20 @@ namespace SmartE_commerce.Controllers
         //    return Ok("Removed");
 
         //}
-        [HttpDelete]
-        [Route("RemoveProduct{id}")]
-        public async Task<IActionResult> DeleteItem(string id)
-        {
-            var item = await _dbContext.Items.FindAsync(id);
-            if (item == null)
-            {
-                return NotFound(new { message = "Item not found." });
-            }
+        //[HttpDelete]
+        //[Route("RemoveProduct{id}")]
+        //public async Task<IActionResult> DeleteItem(string id)
+        //{
+        //    var item = await _dbContext.Items.FindAsync(id);
+        //    if (item == null)
+        //    {
+        //        return NotFound(new { message = "Item not found." });
+        //    }
 
-            _dbContext.Items.Remove(item);
-            await _dbContext.SaveChangesAsync();
-            return Ok(new { message = "Item deleted successfully." });
-        }
+        //    _dbContext.Items.Remove(item);
+        //    await _dbContext.SaveChangesAsync();
+        //    return Ok(new { message = "Item deleted successfully." });
+        //}
 
     }
 }
