@@ -527,7 +527,6 @@ namespace SmartE_commerce.Controllers
         }
 
 
-
         [HttpDelete("RemoveFromComparisons")]
         public async Task<IActionResult> RemoveFromComparisons(string ItemId, int BuyerId)
         {

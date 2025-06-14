@@ -24,7 +24,7 @@ namespace SmartE_commerce.Controllers
         }
 
         [HttpPost("AddProduct")]
-        public async Task<IActionResult> AddItemToWishlist(int BuyerId, int ItemId)
+        public async Task<IActionResult> AddItemToWishlist(int BuyerId, string ItemId)
         {
             try
             {
@@ -41,21 +41,35 @@ namespace SmartE_commerce.Controllers
                     }
                 }
                 var response = new Dictionary<string, object>();
-                response["messageToUser"] = $"Item {ItemId} Added successfully to Wishlist.";
+                response["messageToUser"] = $"Item Added successfully to Wishlist.";
 
                 response["message"] = "success";
 
                 return Ok(response);
             }
+            catch (SqlException sqlEx) when (sqlEx.Number == 2627 || sqlEx.Number == 2601)
+            {
+                // تكرار مفتاح رئيسي أو فريد
+                return BadRequest(new
+                {
+                    message = "duplicate",
+                    messageToUser = $"Item {ItemId} is already in the wishlist."
+                });
+            }
             catch (Exception ex)
             {
-                return StatusCode(500, $"Internal server error: {ex.Message}");
+                return StatusCode(500, new
+                {
+                    message = "error",
+                    messageToUser = "An error occurred while adding the item.",
+                    details = ex.Message
+                });
             }
         }
 
 
         [HttpDelete("RemoveProduct")]
-        public async Task<IActionResult> DeleteItem(int BuyerId, int ItemId)
+        public async Task<IActionResult> DeleteItem(int BuyerId, string ItemId)
         {
             try
             {
@@ -110,8 +124,7 @@ namespace SmartE_commerce.Controllers
                         {
                             var Mas = new Dictionary<string, object>();
 
-                            Mas["message"] = "success";
-                            resultList.Add(Mas);
+                            
 
                             while (await reader.ReadAsync())
                             {
@@ -128,7 +141,14 @@ namespace SmartE_commerce.Controllers
                     }
                 }
 
-                return Ok(resultList);
+                var response = new
+                {
+                    message = "success",
+                    data = resultList
+                };
+
+                return Ok(response);
+               
             }
             catch (Exception ex)
             {

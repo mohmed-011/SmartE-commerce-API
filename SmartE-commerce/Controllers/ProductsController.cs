@@ -135,81 +135,6 @@ namespace SmartE_commerce.Controllers
 
 
 
-
-        //[HttpGet]
-        //[Route("GetAllProducts")]
-        //public async Task<IActionResult> GetAllProducts()
-        //{
-        //    var resultList = new List<Dictionary<string, object>>(); // List to store each product's data
-
-        //    try
-        //    {
-        //        using (SqlConnection connection = new SqlConnection(_connectionString))
-        //        {
-        //            await connection.OpenAsync();
-
-        //            using (SqlCommand command = new SqlCommand("Sp_GetAllProductsv4", connection))
-        //            {
-        //                command.CommandType = CommandType.StoredProcedure;
-
-
-        //                using (SqlDataReader reader = await command.ExecuteReaderAsync())
-        //                {
-        //                    while (await reader.ReadAsync())
-        //                    {
-        //                        var row = new Dictionary<string, object>();
-        //                        var imagesData = new Dictionary<string, string>(); // Dictionary to store images for each product
-
-        //                        for (int i = 0; i < reader.FieldCount; i++)
-        //                        {
-        //                            row[reader.GetName(i)] = reader.GetValue(i);
-        //                            if (reader.GetName(i) == "Item_ID") // Once Item_ID is found
-        //                            {
-        //                                var itemId = reader.GetValue(i).ToString();
-
-        //                                // Now fetch the images for this Item_ID
-        //                                using (SqlCommand command2 = new SqlCommand("Sp_GetItemImagesv4", connection))
-        //                                {
-        //                                    command2.CommandType = CommandType.StoredProcedure;
-        //                                    command2.Parameters.AddWithValue("@ItemID", itemId);
-
-        //                                    using (SqlDataReader reader2 = await command2.ExecuteReaderAsync())
-        //                                    {
-        //                                        int j = 1;
-        //                                        while (await reader2.ReadAsync())
-        //                                        {
-        //                                            // Add images to the dictionary with a dynamic key
-        //                                            imagesData[$"Item_Images-{j}"] = reader2.GetValue(0).ToString();
-        //                                            j++;
-        //                                        }
-        //                                    }
-        //                                }
-        //                            }
-        //                        }
-
-        //                        // Add imagesData to the current product row
-        //                        if (imagesData.Count > 0)
-        //                        {
-        //                            row["images"] = imagesData;
-        //                        }
-
-        //                        // Add the product row to the result list
-        //                        resultList.Add(row);
-        //                    }
-        //                }
-        //            }
-        //        }
-
-        //        return Ok(new { Data = resultList });
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        return StatusCode(500, $"Internal server error: {ex.Message}");
-        //    }
-        //}
-
-
-
         [HttpGet]
         [Route("GetAllProducts")]
         public async Task<IActionResult> GetAllProducts([FromQuery] List<string> itemIds)
@@ -365,7 +290,7 @@ namespace SmartE_commerce.Controllers
 
                         using (SqlDataReader reader2 = await command2.ExecuteReaderAsync())
                         {
-                            
+
                             while (await reader2.ReadAsync())
                             {
                                 for (int i = 0; i < reader2.FieldCount; i++)
@@ -373,17 +298,35 @@ namespace SmartE_commerce.Controllers
                                     DitailsData[reader2.GetName(i)] = reader2.GetValue(i).ToString();
 
                                 }
-                                
+
                             }
                         }
                     }
+                    var ratingSummary = new Dictionary<string, object>();
 
+                    using (SqlCommand command = new SqlCommand("GetProductRatingSummary", connection))
+                    {
+                        command.CommandType = CommandType.StoredProcedure;
+                        command.Parameters.AddWithValue("@Item_ID", id);
+
+                        using (SqlDataReader reader = await command.ExecuteReaderAsync())
+                        {
+                            if (await reader.ReadAsync())
+                            {
+                                ratingSummary["AverageRating"] = reader["AverageRating"];
+                                ratingSummary["TotalReviews"] = reader["TotalReviews"];
+                                ratingSummary["FirstReviewDate"] = reader["FirstReviewDate"];
+                                ratingSummary["LastReviewDate"] = reader["LastReviewDate"];
+                            }
+                        }
+                    }
 
                     // إضافة البيانات والصور إلى كائن الاستجابة النهائي
                     response["Data"] = productData;
                     response["images"] = imagesData;
                     response["Brand"] = BrandData;
                     response["Detilas"] = DitailsData;
+                    response["Rating"] = ratingSummary;
 
 
 
@@ -395,7 +338,6 @@ namespace SmartE_commerce.Controllers
                 return StatusCode(500, $"Internal server error: {ex.Message}");
             }
         }
-
 
 
         [HttpDelete("DeleteProductById")]
@@ -419,7 +361,7 @@ namespace SmartE_commerce.Controllers
                 var response = new
                 {
                     message = "success",
-                    
+
                 };
 
                 return Ok(response);
@@ -430,21 +372,6 @@ namespace SmartE_commerce.Controllers
             }
         }
 
-
-
-
-
-
-
-        //[HttpPost]
-        //[Route("InsertProduct")]
-        //public  ActionResult<int> CreateProduct(Product product)
-        //{
-        //    product.Item_ID = 0;
-        //    _dbContext.Set<Product>().Add(product);
-        //     _dbContext.SaveChanges();
-        //    return Ok(product.Item_ID);
-        //}
 
         [HttpPut("update")]
         public async Task<IActionResult> UpdateItem([FromBody] ItemUpdateDto updatedItem)
@@ -473,8 +400,9 @@ namespace SmartE_commerce.Controllers
                         await connection.OpenAsync();
                         await command.ExecuteNonQueryAsync();
                         return Ok(
-                            new {
-                                message = "success" ,
+                            new
+                            {
+                                message = "success",
                                 display = "Item updated successfully via stored procedure."
                             });
                     }
@@ -486,50 +414,113 @@ namespace SmartE_commerce.Controllers
             }
         }
 
-        //public ActionResult UpdateProduct(Product product)
-        //{
-        //    var existingProduct = _dbContext.Set<Product>().Find(product.Item_ID);
-        //    existingProduct.Item_Name = product.Item_Name;
-        //    existingProduct.Description = product.Description;
-        //    existingProduct.Quantity = product.Quantity;
-        //    existingProduct.Price_in = product.Price_in;
-        //    existingProduct.Price_out = product.Price_out;
-        //    existingProduct.Discount = product.Discount;
-        //    existingProduct.Rate = product.Rate;
-        //    existingProduct.Category_ID = product.Category_ID;
-        //    existingProduct.Sub_Category_ID = product.Sub_Category_ID;
-        //    existingProduct.Seller_ID = product.Seller_ID;
-        //    _dbContext.Set<Product>().Update(existingProduct);
-        //    _dbContext.SaveChanges();
-        //    return Ok("Updated");
 
+        [HttpPost("AddItemView")]
+        public async Task<IActionResult> AddItemView(string Item_ID, int Buyer_ID)
+        {
+            try
+            {
+                using (SqlConnection connection = new SqlConnection(_connectionString))
+                {
+                    await connection.OpenAsync();
+                    using (SqlCommand command = new SqlCommand("Add_Item_View", connection))
+                    {
+                        command.CommandType = CommandType.StoredProcedure;
+                        command.Parameters.AddWithValue("@Item_ID", Item_ID);
+                        command.Parameters.AddWithValue("@Buyer_ID", Buyer_ID);
 
+                        await command.ExecuteNonQueryAsync();
+                    }
+                }
+                var response = new
+                {
+                    message = "success",
+                    display = "Item view count updated successfully."
+                };
+                return Ok(response);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
 
-        //}
+        }
 
+        [HttpPost("AddProductReview")]
+        public async Task<IActionResult> AddProductReview(string Item_ID, int Buyer_ID, float Rating, string Comment)
+        {
+            try
+            {
+                using (SqlConnection connection = new SqlConnection(_connectionString))
+                {
+                    await connection.OpenAsync();
+                    using (SqlCommand command = new SqlCommand("AddProductReview", connection))
+                    {
+                        command.CommandType = CommandType.StoredProcedure;
+                        command.Parameters.AddWithValue("@Item_ID", Item_ID);
+                        command.Parameters.AddWithValue("@Buyer_ID", Buyer_ID);
+                        command.Parameters.AddWithValue("@Rating", Rating);
+                        command.Parameters.AddWithValue("@Comment", Comment);
+                        await command.ExecuteNonQueryAsync();
+                    }
+                }
 
-        //public ActionResult RemoveProduct(int id)
-        //{
-        //    var existingProduct = _dbContext.Set<Product>().Find(id);
-        //    _dbContext.Set<Product>().Remove(existingProduct);
-        //    _dbContext.SaveChanges();
-        //    return Ok("Removed");
+                var response = new Dictionary<string, object>
+                {
+                    ["message"] = "success",
+                    ["messageToUser"] = "Review added successfully."
+                };
+                return Ok(response);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
+        }
 
-        //}
-        //[HttpDelete]
-        //[Route("RemoveProduct{id}")]
-        //public async Task<IActionResult> DeleteItem(string id)
-        //{
-        //    var item = await _dbContext.Items.FindAsync(id);
-        //    if (item == null)
-        //    {
-        //        return NotFound(new { message = "Item not found." });
-        //    }
+        [HttpGet("GetProductReviews")]
+        public async Task<IActionResult> GetProductReviews(string Item_ID)
+        {
+            var resultList = new List<Dictionary<string, object>>();
 
-        //    _dbContext.Items.Remove(item);
-        //    await _dbContext.SaveChangesAsync();
-        //    return Ok(new { message = "Item deleted successfully." });
-        //}
+            try
+            {
+                using (SqlConnection connection = new SqlConnection(_connectionString))
+                {
+                    await connection.OpenAsync();
+                    using (SqlCommand command = new SqlCommand("GetProductReviews", connection))
+                    {
+                        command.CommandType = CommandType.StoredProcedure;
+                        command.Parameters.AddWithValue("@Item_ID", Item_ID);
+
+                        using (SqlDataReader reader = await command.ExecuteReaderAsync())
+                        {
+                            while (await reader.ReadAsync())
+                            {
+                                var row = new Dictionary<string, object>();
+                                for (int i = 0; i < reader.FieldCount; i++)
+                                {
+                                    row[reader.GetName(i)] = reader.GetValue(i);
+                                }
+                                resultList.Add(row);
+                            }
+                        }
+                    }
+                }
+
+                var response = new
+                {
+                    message = "success",
+                    data = resultList
+                };
+
+                return Ok(response);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
+        }
 
     }
 }
